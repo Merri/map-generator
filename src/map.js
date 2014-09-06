@@ -816,9 +816,7 @@ var Map = function(width, height) {
 		for(i = 0; i < _size; i++) {
 			_rawMap[_blockHeight + i] = baseLevel;
 		}
-
-		return this;
-	}.bind(this);
+	};
 
 	var initializeTexture = function(texture) {
 		var i;
@@ -830,9 +828,7 @@ var Map = function(width, height) {
 				_rawMap[_blockTextures + i] = texture;
 			}
 		}
-
-		return this;
-	}.bind(this);
+	};
 
 	var isEachTextureSame = function(index, texture) {
 		var nodes,
