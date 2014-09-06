@@ -2,6 +2,6 @@
 	"name": "map-generator",
 	"version": "1.0.0",
 	"scripts": {
-		"start": "watchify -t reactify -r ./src/generator.js:Generator -o ./public/bundle.js -v"
+		"start": "watchify -t reactify -d -r ./src/generator.js:Generator -t minifyify -o ./public/bundle.js -v"
 	}
 }

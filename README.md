@@ -14,6 +14,7 @@ Setting up development environment
 Just clone to your preferred git project location. In addition you need Node, Browserify, Reactify and Watchify.
 
 	npm install -g browserify
+	npm install -g minifyify
 	npm install -g reactify
 	npm install -g watchify
 
