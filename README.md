@@ -1,7 +1,7 @@
 The Settlers II.net Map Generator
 =================================
 
-Generates random maps for (The Settlers II)[http://settlers2.net/] and Return to the Roots.
+Generates random maps for [The Settlers II](http://settlers2.net/) and [Return to the Roots](http://www.rttr.info/).
 
 
 Setting up development environment
