@@ -58,7 +58,7 @@ var Map = function(width, height) {
 		_blockArea = _size * 13;
 
 	// always seven
-	for(i = _blockOfSeven; i < _blockOfSeven + _size; i++) {
+	for(var i = _blockOfSeven; i < _blockOfSeven + _size; i++) {
 		_rawMap[i] = 7;
 	}
 
@@ -250,6 +250,10 @@ var Map = function(width, height) {
 			tex4,
 			tex5,
 			tex6,
+			tex7,
+			tex8,
+			tex9,
+			texA,
 			texNodes,
 			waters = 0;
 
@@ -626,8 +630,8 @@ var Map = function(width, height) {
 				right: y + xR,
 				topLeft: yT + x,
 				topRight: yT + xR,
-				bottomLeft: yB + xL,
-				bottomRight: yB + x
+				bottomLeft: yB + x,
+				bottomRight: yB + xR
 			}
 		} else {
 			// even
@@ -636,8 +640,8 @@ var Map = function(width, height) {
 				right: y + xR,
 				topLeft: yT + xL,
 				topRight: yT + x,
-				bottomLeft: yB + x,
-				bottomRight: yB + xR
+				bottomLeft: yB + xL,
+				bottomRight: yB + x
 			}
 		}
 	};
