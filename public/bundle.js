@@ -1067,7 +1067,6 @@ var Generator = function() {
 		pos++;
 		view.setUint16(pos++, height, true);
 		pos++;
-		console.log('HEADER:', pos);
 		// MAP DATA
 		for(i = 0; i < 14; i++) {
 			view.setUint8(pos++, 0x10);
@@ -1082,7 +1081,6 @@ var Generator = function() {
 			pos++;
 			view.setUint32(pos, size, true);
 			pos += 4;
-			console.log('BLOCK:', i, pos, pos + size, buffer.byteLength);
 			byteView = new Uint8Array(buffer, pos, size);
 			pos += size;
 			byteView.set(data.subarray(i * size, (i + 1) * size));
@@ -1166,7 +1164,7 @@ var Generator = function() {
 };
 
 module.exports = Generator;
-},{"./constants":5,"./map":6,"promise":3}],1:[function(require,module,exports){
+},{"./constants":"c:\\Users\\Merri\\documents\\git\\map-generator\\src\\constants.js","./map":"c:\\Users\\Merri\\documents\\git\\map-generator\\src\\map.js","promise":"c:\\Users\\Merri\\documents\\git\\map-generator\\node_modules\\promise\\index.js"}],"c:\\Users\\Merri\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\process\\browser.js":[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -1231,7 +1229,7 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
-},{}],2:[function(require,module,exports){
+},{}],"c:\\Users\\Merri\\documents\\git\\map-generator\\node_modules\\promise\\core.js":[function(require,module,exports){
 'use strict';
 
 var asap = require('asap')
@@ -1338,7 +1336,7 @@ function doResolve(fn, onFulfilled, onRejected) {
   }
 }
 
-},{"asap":4}],3:[function(require,module,exports){
+},{"asap":"c:\\Users\\Merri\\documents\\git\\map-generator\\node_modules\\promise\\node_modules\\asap\\asap.js"}],"c:\\Users\\Merri\\documents\\git\\map-generator\\node_modules\\promise\\index.js":[function(require,module,exports){
 'use strict';
 
 //This file contains then/promise specific extensions to the core promise API
@@ -1520,7 +1518,7 @@ Promise.prototype['catch'] = function (onRejected) {
   return this.then(null, onRejected);
 }
 
-},{"./core.js":2,"asap":4}],4:[function(require,module,exports){
+},{"./core.js":"c:\\Users\\Merri\\documents\\git\\map-generator\\node_modules\\promise\\core.js","asap":"c:\\Users\\Merri\\documents\\git\\map-generator\\node_modules\\promise\\node_modules\\asap\\asap.js"}],"c:\\Users\\Merri\\documents\\git\\map-generator\\node_modules\\promise\\node_modules\\asap\\asap.js":[function(require,module,exports){
 (function (process){
 
 // Use the fastest possible means to execute a task in a future turn
@@ -1637,7 +1635,7 @@ module.exports = asap;
 
 
 }).call(this,require('_process'))
-},{"_process":1}],5:[function(require,module,exports){
+},{"_process":"c:\\Users\\Merri\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\process\\browser.js"}],"c:\\Users\\Merri\\documents\\git\\map-generator\\src\\constants.js":[function(require,module,exports){
 'use strict';
 
 var AREA = {
@@ -2286,7 +2284,7 @@ exports.TEXTURE = TEXTURE;
 exports.TEXTURE_INFO = TEXTURE_INFO;
 exports.TREE_INFO = TREE_INFO;
 
-},{}],6:[function(require,module,exports){
+},{}],"c:\\Users\\Merri\\documents\\git\\map-generator\\src\\map.js":[function(require,module,exports){
 'use strict';
 
 var constants = require('./constants'),
@@ -3230,4 +3228,4 @@ var Map = function(width, height) {
 }
 
 module.exports = Map;
-},{"./constants":5}]},{},[]);
+},{"./constants":"c:\\Users\\Merri\\documents\\git\\map-generator\\src\\constants.js"}]},{},[]);

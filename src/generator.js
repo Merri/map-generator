@@ -1066,7 +1066,6 @@ var Generator = function() {
 		pos++;
 		view.setUint16(pos++, height, true);
 		pos++;
-		console.log('HEADER:', pos);
 		// MAP DATA
 		for(i = 0; i < 14; i++) {
 			view.setUint8(pos++, 0x10);
@@ -1081,7 +1080,6 @@ var Generator = function() {
 			pos++;
 			view.setUint32(pos, size, true);
 			pos += 4;
-			console.log('BLOCK:', i, pos, pos + size, buffer.byteLength);
 			byteView = new Uint8Array(buffer, pos, size);
 			pos += size;
 			byteView.set(data.subarray(i * size, (i + 1) * size));
