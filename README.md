@@ -11,9 +11,10 @@ See the [TODO list](https://github.com/Merri/map-generator/wiki) @ wiki.
 Setting up development environment
 ----------------------------------
 
-You need Node, Browserify and Reactify.
+You need Node, Browserify and Reactify. Watchify provides real time compilation convenience.
 
 	npm install -g browserify
 	npm install -g reactify
+	npm install -g watchify
 
 TODO: package.json... figure out npm build process... create build and dev switches... watch for changes in real time...
