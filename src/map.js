@@ -834,6 +834,41 @@ var Map = function(width, height) {
         }
     };
 
+    var isAnyTextureWithAnyOfFlags = function(index, flags) {
+        var nodes,
+            topLeft,
+            top,
+            topRight,
+            bottomLeft,
+            bottom,
+            bottomRight;
+
+        if(_lastTextureIndex === index) {
+            topLeft = _lastTextureTopLeft;
+            top = _lastTextureTop;
+            topRight = _lastTextureTopRight;
+            bottomLeft = _lastTextureBottomLeft;
+            bottom = _lastTextureBottom;
+            bottomRight = _lastTextureBottomRight;
+        } else {
+            nodes = getTextureNodesByIndex(index);
+            _lastTextureIndex = index;
+            _lastTextureTopLeft     = topLeft     = _rawMap[_blockTextures + nodes.topLeft    ] & TEXTURE.TO_ID_VALUE;
+            _lastTextureTop         = top         = _rawMap[_blockTextures + nodes.top        ] & TEXTURE.TO_ID_VALUE;
+            _lastTextureTopRight    = topRight    = _rawMap[_blockTextures + nodes.topRight   ] & TEXTURE.TO_ID_VALUE;
+            _lastTextureBottomLeft  = bottomLeft  = _rawMap[_blockTextures + nodes.bottomLeft ] & TEXTURE.TO_ID_VALUE;
+            _lastTextureBottom      = bottom      = _rawMap[_blockTextures + nodes.bottom     ] & TEXTURE.TO_ID_VALUE;
+            _lastTextureBottomRight = bottomRight = _rawMap[_blockTextures + nodes.bottomRight] & TEXTURE.TO_ID_VALUE;
+        }
+
+        return !!(TEXTURE_INFO[topLeft    ].FLAG & flags)
+            || !!(TEXTURE_INFO[top        ].FLAG & flags)
+            || !!(TEXTURE_INFO[topRight   ].FLAG & flags)
+            || !!(TEXTURE_INFO[bottomLeft ].FLAG & flags)
+            || !!(TEXTURE_INFO[bottom     ].FLAG & flags)
+            || !!(TEXTURE_INFO[bottomRight].FLAG & flags);
+    };
+
     var isEachTextureSame = function(index, texture) {
         var nodes,
             topLeft,
@@ -934,6 +969,7 @@ var Map = function(width, height) {
         getTexturesByIndex: getTexturesByIndex,
         initializeHeight: initializeHeight,
         initializeTexture: initializeTexture,
+        isAnyTextureWithAnyOfFlags: isAnyTextureWithAnyOfFlags,
         isEachTextureSame: isEachTextureSame,
         isEachTextureWithAnyOfFlags: isEachTextureWithAnyOfFlags,
         setTexture: setTexture

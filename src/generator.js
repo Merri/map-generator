@@ -229,6 +229,10 @@ var Generator = function() {
     var createBaseTextures = function(options) {
         var changed = false,
             i,
+            j,
+            heightTotal = new Uint32Array(60),
+            smallestHeight = 60,
+            biggestHeight = 0,
             mountainTextures = [1, 11, 12, 13],
             textureBlock1 = size * 1,
             textureBlock2 = size * 2,
@@ -243,10 +247,29 @@ var Generator = function() {
 
         map.initializeTexture(options.texture);
 
+        // find out where we have the most mass
+        for(i = 0; i < size; i++) {
+            heightTotal[data[i]]++;
+            if(smallestHeight > data[i]) smallestHeight = data[i];
+            if(biggestHeight < data[i]) biggestHeight = data[i];
+        }
+
         // draw water texture
         for(i = 0; i < size; i++) {
-            if(data[i] >= (baseLevel - 2) && data[i] <= (baseLevel + 2) && seedMap[i] < 2) {
-                map.setTexture(i, options.waterTexture);
+            j = seedMap[i] & 3;
+            if(data[i] >= (baseLevel - 2) && data[i] <= (baseLevel + 2)) {
+                if(seedMap[i] < 2) {
+                    map.setTexture(i, options.waterTexture);
+                } else if(j > 1) {
+                    // Meadow / Pasture / Tundra
+                    map.setTexture(i, 0x07 + (seedMap[i] & 3));
+                } else if(j === 0) {
+                    // Flower variant
+                    map.setTexture(i, 0x0F);
+                }
+            } else if(/*j === 0 &&*/ smallestHeight > data[i] - 2) {
+                // Swamp
+                map.setTexture(i, 0x03);
             }
         }
 
@@ -255,14 +278,7 @@ var Generator = function() {
         // draw mountain texture
         if(options.mountainGenerate === 7) {
             for(i = 0; i < size; i++) {
-                if(
-                    data[textureBlock1 + i] !== 0x04
-                    && data[textureBlock1 + i] !== 0x07
-                    && data[textureBlock1 + i] !== 0x11
-                    && data[textureBlock2 + i] !== 0x04
-                    && data[textureBlock2 + i] !== 0x07
-                    && data[textureBlock2 + i] !== 0x11
-                ) {
+                if(!map.isAnyTextureWithAnyOfFlags(i, TEXTURE.ARID | TEXTURE.IMPASSABLE)) {
                     siteNodes = map.getNodesByIndex(i);
                     if(
                         (data[siteBlock + siteNodes.left] & 0xF7) === 0x01
@@ -278,15 +294,7 @@ var Generator = function() {
             }
         } else if(options.mountainGenerate === 6) {
             for(i = 0; i < size; i++) {
-                if(
-                    (data[siteBlock + i] & 0xF7) === 0x01
-                    && data[textureBlock1 + i] !== 0x04
-                    && data[textureBlock1 + i] !== 0x07
-                    && data[textureBlock1 + i] !== 0x11
-                    && data[textureBlock2 + i] !== 0x04
-                    && data[textureBlock2 + i] !== 0x07
-                    && data[textureBlock2 + i] !== 0x11
-                ) {
+                if((data[siteBlock + i] & 0xF7) === 0x01 && !map.isAnyTextureWithAnyOfFlags(i, TEXTURE.ARID | TEXTURE.IMPASSABLE)) {
                     siteNodes = map.getNodesByIndex(i);
                     if(
                         (data[siteBlock + siteNodes.left] & 0xF7) === 0x01
@@ -302,15 +310,7 @@ var Generator = function() {
             }
         } else {
             for(i = 0; i < size; i++) {
-                if(
-                    (data[siteBlock + i] & 0xF7) === 0x01
-                    && data[textureBlock1 + i] !== 0x04
-                    && data[textureBlock1 + i] !== 0x07
-                    && data[textureBlock1 + i] !== 0x11
-                    && data[textureBlock2 + i] !== 0x04
-                    && data[textureBlock2 + i] !== 0x07
-                    && data[textureBlock2 + i] !== 0x11
-                ) {
+                if((data[siteBlock + i] & 0xF7) === 0x01 && !map.isAnyTextureWithAnyOfFlags(i, TEXTURE.ARID | TEXTURE.IMPASSABLE)) {
                     siteNodes = map.getNodesByIndex(i);
                     if(
                         options.mountainGenerate <= (((data[siteBlock + siteNodes.left] & 0xF7) === 0x01)
@@ -626,18 +626,18 @@ var Generator = function() {
                 } else if (textureFlag & TEXTURE.ROCK) {
                     // add coal / iron ore / gold / granite
                     newResource = seedMap[i] & 0x3F;
-                    if(newResource < 0x20) {
-                        newResource = RESOURCE.COAL | 0x07;
-                        resources.mineCoal++;
-                    } else if (newResource < 0x2E) {
-                        newResource = RESOURCE.GOLD | 0x07;
-                        resources.mineGold++;
-                    } else if (newResource < 0x3C) {
-                        newResource = RESOURCE.IRON_ORE | 0x07;
-                        resources.mineIronOre++;
+                    if(newResource < /*0x20*/0x2C) {
+                        newResource = RESOURCE.COAL | (i & 0x07);
+                        resources.mineCoal += (i & 0x07);
+                    } else if (newResource < 0x30) {
+                        newResource = RESOURCE.GOLD | (i & 0x07);
+                        resources.mineGold += (i & 0x07);
+                    } else if (newResource < 0x3E) {
+                        newResource = RESOURCE.IRON_ORE | (i & 0x07);
+                        resources.mineIronOre += (i & 0x07);
                     } else {
-                        newResource = RESOURCE.GRANITE | 0x07;
-                        resources.mineGranite++;
+                        newResource = RESOURCE.GRANITE | (i & 0x07);
+                        resources.mineGranite += (i & 0x07);
                     }
                 } else if (textureFlag & TEXTURE.HABITABLE) {
                     if(textureFlag & TEXTURE.ARABLE) {

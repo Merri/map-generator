@@ -116,7 +116,8 @@ label {
     background-image: url('./water-2.png');
 }
 
-section {
+.map-view-container,
+.tab section {
     background: #eee;
     display: inline-block;
     margin: 0.25em 0;
@@ -132,7 +133,8 @@ header {
     font-weight: bold;
 }
 
-ul {
+.map-view-container ul,
+.tab ul {
     list-style: none;
     margin: 1em 0;
     padding: 0;
@@ -204,3 +206,61 @@ button {
     z-index: 1;
 }
 
+
+
+
+.generator-compatibility {
+
+}
+
+.generator-compatibility__title {
+    font-size: 1.125em;
+    font-weight: bold;
+    margin: 0.25em;
+}
+
+.generator-compatibility__description {
+    background: #fff;
+    border: 1px solid #222;
+    font-size: smaller;
+    opacity: 0;
+    margin: 0;
+    padding: 1px 1em;
+    -webkit-pointer-events: none;
+    -moz-pointer-events: none;
+    pointer-events: none;
+    position: absolute;
+    -webkit-transition: z-index 0s linear 0.5s,
+        opacity 0.125s ease-in-out 0.01s;
+    transition: z-index 0s linear 0.5s,
+        opacity 0.125s ease-in-out 0.01s;
+    width: 25em;
+    z-index: -1;
+}
+
+.generator-compatibility__title:hover + .generator-compatibility__description {
+    opacity: 1;
+    -webkit-transition: z-index 0s linear 0s,
+        opacity 0.25s ease-in-out 0.01s;
+    transition: z-index 0s linear 0s,
+        opacity 0.25s ease-in-out 0.01s;
+    z-index: 1;
+}
+
+.generator-statistics {
+    background: #fffcf6;
+    border: 1px solid #464;
+    padding: 0.5em;
+    width: 12em;
+}
+
+.generator-statistics dt {
+    clear: left;
+    float: left;
+    width: 8em;
+}
+
+.generator-statistics dd {
+    margin: 0;
+    vertical-align: top;
+}
