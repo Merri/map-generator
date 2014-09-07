@@ -70,7 +70,6 @@ var Generator = function() {
 
     var seed = function(options) {
         //if(!options || !options.length) options = {};
-        console.time('Generate');
         var likelyhood = options.likelyhood,
             givenStartingPoints = ~~options.startingPoints,
             givenMassRatio = ~~options.massRatio
@@ -144,15 +143,11 @@ var Generator = function() {
                 else /*if(value === 2) */value = 128;
             }
         }
-
-        console.timeEnd('Generate');
     };
 
     //options: baseLevel
     var createHeight = function(options) {
         //if(!options || !options.length) options = {};
-        console.time('Height map');
-
         baseLevel = options.baseLevel = ~~options.baseLevel;
         options.groundLevel = Math.abs(~~options.groundLevel);
         options.flatten = Math.abs(options.flatten);
@@ -228,11 +223,7 @@ var Generator = function() {
             }
         }
 
-        console.timeEnd('Height map');
-
-        console.time('lightMap');
         map.calculateLightMap();
-        console.timeEnd('lightMap');
     };
 
     var createBaseTextures = function(options) {
@@ -243,8 +234,6 @@ var Generator = function() {
             textureBlock2 = size * 2,
             siteBlock = size * 8,
             siteNodes;
-
-        console.time('Texture');
 
         // sanitize
         options.mountainGenerate = ~~options.mountainGenerate;
@@ -261,7 +250,6 @@ var Generator = function() {
             }
         }
 
-        console.time('Draw Mountains (requires x2 calculateSites)');
         map.calculateSiteMap();
         
         // draw mountain texture
@@ -510,15 +498,10 @@ var Generator = function() {
         }
 
         map.calculateSiteMap();
-        console.timeEnd('Draw Mountains (requires x2 calculateSites)');
-
-        console.timeEnd('Texture');
     };
 
     var getRandomPlayerPositions = function(maxPlayerCount, radius) {
         players = [];
-
-        console.time('getRandomPlayerPositions');
 
         // sanitize
         maxPlayerCount = ~~maxPlayerCount;
@@ -562,8 +545,6 @@ var Generator = function() {
         // start the recursive call (if necessary)
         if(maxPlayerCount > 0) generateRandomPlayers(map.getAllSitesOfType(SITE.CASTLE));
 
-        console.timeEnd('getRandomPlayerPositions');
-
         return players;
     };
 
@@ -594,8 +575,6 @@ var Generator = function() {
             siteBlock = size * 8,
             touchBlock = size * 10,
             resourceBlock = size * 11;
-
-        console.time('applyResources');
 
         // clean up
         for(i = 0; i < size; i++) {
@@ -752,8 +731,6 @@ var Generator = function() {
 
         // must do this again now
         map.calculateSiteMap();
-
-        console.timeEnd('applyResources')
 
         return resources;
     };

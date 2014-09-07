@@ -11,6 +11,7 @@
 
     </head>
     <body>
+        <div id="app"></div>
         <h1>The Settlers II.net Map Generator</h1>
         <p>Create random maps for <a href="http://www.gog.com/game/the_settlers_2_gold_edition">The Settlers II</a> and <a href="http://www.rttr.info/"><abbr title="Return to the Roots">RttR</abbr></a>!</p>
         <section class="map-view-container">
@@ -429,7 +430,7 @@
                 </div>
             </div>
         </div>
-        <script>
+        <script>/*
 (function(global) {
     var Generator = new require('Generator')();
 
@@ -515,7 +516,7 @@
     };
 
     applyResourcesButton.onclick = function() {
-        console.log(Generator.applyResources({}));
+        console.log();
         viewTypeElement.click();
     }
 
@@ -570,7 +571,7 @@
     } else {
         setTimeout(waitingToClick, 0);
     }
-})(this);
+})(this);*/
         </script>
         <script>
 if(window.location.hostname === 'settlers2.net') {

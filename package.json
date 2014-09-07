@@ -2,6 +2,10 @@
 	"name": "map-generator",
 	"version": "1.0.0",
 	"scripts": {
-		"start": "watchify -t reactify -d -r ./src/generator.js:Generator -t minifyify -o ./public/bundle.js -v"
+		"start": "watchify -t reactify ./src/controller.jsx -d -p [minifyify --map bundle.map.json --output ./public/bundle.map.json] -o ./public/bundle.js -v"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/Merri/map-generator.git"
 	}
 }

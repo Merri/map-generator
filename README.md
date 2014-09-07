@@ -11,11 +11,9 @@ See the [TODO list](https://github.com/Merri/map-generator/wiki) @ wiki.
 Setting up development environment
 ----------------------------------
 
-Just clone to your preferred git project location. In addition you need Node, Browserify, Reactify and Watchify.
+Just clone to your preferred git project location. You need Node and also the following.
 
 	npm install -g browserify
-	npm install -g minifyify
-	npm install -g reactify
 	npm install -g watchify
 
 After this you should be able to run continuous preprocessing by typing `npm start`. JavaScript is processed on the fly.
