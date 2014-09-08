@@ -91,6 +91,7 @@ var App = React.createClass({
         generateHeightMap();
         generateTextures();
         this.setState({
+            players: [],
             resources: generateAndGetResources()
         });
         console.timeEnd('New Seed, Height Map, Textures and Resources');
@@ -102,6 +103,7 @@ var App = React.createClass({
         generateHeightMap();
         generateTextures();
         this.setState({
+            players: [],
             resources: generateAndGetResources()
         });
         console.timeEnd('Height Map, Textures and Resources');
@@ -112,6 +114,7 @@ var App = React.createClass({
         console.time('Textures and Resources');
         generateTextures();
         this.setState({
+            players: [],
             resources: generateAndGetResources()
         });
         console.timeEnd('Textures and Resources');

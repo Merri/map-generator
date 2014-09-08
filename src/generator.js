@@ -112,6 +112,48 @@ var Generator = function() {
                 startingPoints++;
             }
         }
+        /*x = ~~(Math.random() * (width - borderProtection * 2)) + borderProtection;
+        y = ~~(Math.random() * (height - borderProtection * 2)) + borderProtection;
+        index = y * width + x;
+        var direction = ~~(Math.random() * 6),
+            around;
+        while(startingPoints < givenStartingPoints) {
+            
+            around = map.getNodesByIndex(index);
+            switch(direction) {
+                case 1:
+                    index = around.topLeft;
+                    break;
+                case 2:
+                    index = around.topRight;
+                    break;
+                case 3:
+                    index = around.right;
+                    break;
+                case 4:
+                    index = around.bottomRight;
+                    break;
+                case 5:
+                    index = around.bottomLeft;
+                    break;
+                default:
+                    index = around.left;
+            }
+
+            x = index % width;
+            y = ~~((index - x) / width);
+
+            if(x >= borderProtection && x < (width - borderProtection)
+                && y >= borderProtection && y < (height - borderProtection)) {
+                if(Math.random() < 0.15 && seedMap[index] === 0) {
+                    if((startingPoints & 7) === 0) {
+                        direction = (6 + (direction + ~~(Math.random() * 3) - 1)) % 6;
+                    }
+                    expandTo(index, value);
+                    startingPoints++;
+                }
+            }
+        }*/
 
         // do the land expansion
         if(mass > 0) {
@@ -494,6 +536,13 @@ var Generator = function() {
                     default:
                     }
                 }
+            }
+        }
+
+        // post processing
+        for(i = 0; i < size; i++) {
+            if(map.isAnyTextureWithAnyOfFlags(i, TEXTURE.ROCK)) {
+                map.replaceTextureAnyOfFlags(i, 0x12, TEXTURE.ARABLE);
             }
         }
 

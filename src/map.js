@@ -939,6 +939,29 @@ var Map = function(width, height) {
             && !!(TEXTURE_INFO[bottomRight].FLAG & flags);
     };
 
+    // will replace a texture if any of it's flags matches with the flags
+    var replaceTextureAnyOfFlags = function(index, texture, flags) {
+        var nodes;
+        // sanitize
+        texture = Math.abs(~~texture);
+        // is this a known texture?
+        if(TEXTURE_INFO[texture]) {
+            nodes = getTextureNodesByIndex(index);
+            if(TEXTURE_INFO[_rawMap[_blockTextures + nodes.bottomLeft] & TEXTURE.TO_ID_VALUE].FLAG & flags)
+                _rawMap[_blockTextures + nodes.bottomLeft] = texture;
+            if(TEXTURE_INFO[_rawMap[_blockTextures + nodes.bottom] & TEXTURE.TO_ID_VALUE].FLAG & flags)
+                _rawMap[_blockTextures + nodes.bottom] = texture;
+            if(TEXTURE_INFO[_rawMap[_blockTextures + nodes.bottomRight] & TEXTURE.TO_ID_VALUE].FLAG & flags)
+                _rawMap[_blockTextures + nodes.bottomRight] = texture;
+            if(TEXTURE_INFO[_rawMap[_blockTextures + nodes.topLeft] & TEXTURE.TO_ID_VALUE].FLAG & flags)
+                _rawMap[_blockTextures + nodes.topLeft] = texture;
+            if(TEXTURE_INFO[_rawMap[_blockTextures + nodes.top] & TEXTURE.TO_ID_VALUE].FLAG & flags)
+                _rawMap[_blockTextures + nodes.top] = texture;
+            if(TEXTURE_INFO[_rawMap[_blockTextures + nodes.topRight] & TEXTURE.TO_ID_VALUE].FLAG & flags)
+                _rawMap[_blockTextures + nodes.topRight] = texture;
+        }
+    };
+
     var setTexture = function(index, texture) {
         var nodes;
         // sanitize
@@ -972,6 +995,7 @@ var Map = function(width, height) {
         isAnyTextureWithAnyOfFlags: isAnyTextureWithAnyOfFlags,
         isEachTextureSame: isEachTextureSame,
         isEachTextureWithAnyOfFlags: isEachTextureWithAnyOfFlags,
+        replaceTextureAnyOfFlags: replaceTextureAnyOfFlags,
         setTexture: setTexture
     };
 }
