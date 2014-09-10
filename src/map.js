@@ -32,6 +32,8 @@ var Map = function(width, height) {
         _rawMap = new Uint8Array(_rawMapBuffer),
         // fast helper cache
         _cache32bit = new Uint32Array(_size),
+        _cacheRadius = {},
+        _cacheRadiusOutset = {},
         // other cache
         _lastTextureIndex,
         _lastTextureTopLeft,
@@ -46,6 +48,7 @@ var Map = function(width, height) {
         _blockTex1 = _size,
         _blockTex2 = _size * 2,
         _blockRoad = _size * 3,
+        _blockObjects = _size * 4,
         _blockObjIdx = _size * 4,
         _blockObjType = _size * 5,
         _blockAnimals = _size * 6,
@@ -648,18 +651,19 @@ var Map = function(width, height) {
 
     // return array of indexes for nearby points
     // outset = boolean, return only the outermost radius points
-    var getRadiusNodes = function(x, y, radius, outset, buffer) {
+    // WARNING! This function has quite an aggressive cache, you should not make two calls in a row!
+    // ie. don't do var a = getRadiusNodes(), b = getRadiusNodes() as BOTH will have the results of "b"
+    var getRadiusNodes = function(x, y, radius, outset) {
         var nodes,
             i,
             j,
             k = 0,
             l,
             m,
-            first = 0,
-            last = 0,
-            removeLast = 1 === (y & 1),
-            xCache,
-            yCache,
+            removeLast = 0 === (y & 1),
+            xMin,
+            xMax,
+            yIndex,
             maxRadius;
 
         // sanitize input
@@ -667,87 +671,115 @@ var Map = function(width, height) {
         outset = !!outset;
         // see if we add the point itself to result blocks
         if(radius === 0) {
-            nodes = new Uint32Array(buffer || 1);
+            if(!_cacheRadius[radius]) {
+                _cacheRadius[radius] = new Uint32Array(1);
+            }
+            nodes = _cacheRadius[radius];
             nodes[0] = y * _width + x;
         // make sure the radius does not overlap itself
         } else {
             // some limits have to be in place
             maxRadius = ~~((Math.min(_width, _height) - 2) / 2);
             if(radius > maxRadius) radius = maxRadius;
-            // cache X and Y values to avoid recalculating all the time
-            xCache = new Uint32Array(radius * 2 + 1);
-            yCache = new Uint32Array(radius * 2 + 1);
-            // see if we need to care about borders
-            if((x - radius) >= 0 && (y - radius) >= 0 && (x + radius) < _width && (y + radius) < _height) {
-                // we are nowhere close
-                for(j = 0, i = -radius; i <= radius; i++) {
-                    xCache[j] = x + i;
-                    yCache[j++] = y + i;
-                }
-            } else {
-                // have to play it safe
-                for(j = 0, i = -radius; i <= radius; i++) {
-                    xCache[j] = (_width + x + i) % _width;
-                    yCache[j++] = (_height + y + i) % _height;
-                }
-            }
-            // last index in X
-            last = radius * 2;
+            // calculate some helper variables
+            xMin = (_width + x - radius) % _width;
+            xMax = (x + radius) % _width;
+            l = m = yIndex = y * _width;
             // all nodes or only the edge nodes?
             if(!outset) {
-                // calculate the total size of resulting array
-                nodes = new Uint32Array(buffer || 1 + 6 * (radius * (radius + 1) >> 1));
+                if(!_cacheRadius[radius]) {
+                    // calculate the total size of resulting array
+                    _cacheRadius[radius] = new Uint32Array(1 + 6 * (radius * (radius + 1) >> 1));
+                }
+                nodes = _cacheRadius[radius];
                 // start pushing out the results
-                for(i = 0; i < xCache.length; i++) {
-                    nodes[k++] = yCache[radius] * _width + xCache[i];
+                if(xMin < xMax) {
+                    for(i = xMin; i <= xMax; i++) {
+                        nodes[k++] = yIndex + i;
+                    }
+                } else {
+                    for(i = xMin; i < _width; i++) {
+                        nodes[k++] = yIndex + i;
+                    }
+                    for(i = 0; i <= xMax; i++) {
+                        nodes[k++] = yIndex + i;
+                    }
                 }
                 // then all the other Y rows
                 for(j = 1; j <= radius; j++) {
                     if(removeLast) {
-                        last--;
+                        if(xMax > 0) xMax--;
+                        else xMax = _width - 1;
                     } else {
-                        first++;
+                        xMin = ++xMin % _width;
                     }
                     removeLast = !removeLast;
-                    l = yCache[radius - j] * _width;
-                    m = yCache[radius + j] * _width;
-                    for(i = first; i <= last; i++) {
-                        nodes[k++] = l + xCache[i];
-                        nodes[k++] = m + xCache[i];
+                    l = (_size + l - _width) % _size;
+                    m = (m + _width) % _size;
+                    if(xMin < xMax) {
+                        for(i = xMin; i <= xMax; i++) {
+                            nodes[k++] = l + i;
+                            nodes[k++] = m + i;
+                        }
+                    } else {
+                        for(i = xMin; i < _width; i++) {
+                            nodes[k++] = l + i;
+                            nodes[k++] = m + i;
+                        }
+                        for(i = 0; i <= xMax; i++) {
+                            nodes[k++] = l + i;
+                            nodes[k++] = m + i;
+                        }
                     }
                 }
             } else {
-                // calculate the total size of resulting array
-                nodes = new Uint32Array(buffer || 6 * radius);
+                if(!_cacheRadiusOutset[radius]) {
+                    // calculate the total size of resulting array
+                    _cacheRadiusOutset[radius] = new Uint32Array(6 * radius);
+                }
+                nodes = _cacheRadiusOutset[radius];
                 // current line first and last
-                nodes[k++] = yCache[radius] * _width + xCache[first];
-                nodes[k++] = yCache[radius] * _width + xCache[last];
+                nodes[k++] = yIndex + xMin;
+                nodes[k++] = yIndex + xMax;
                 // first and last on all lines except the topmost and bottommost row
                 for(j = 1; j < radius; j++) {
                     if(removeLast) {
-                        last--;
+                        if(xMax > 0) xMax--;
+                        else xMax = _width - 1;
                     } else {
-                        first++;
+                        xMin = ++xMin % _width;
                     }
                     removeLast = !removeLast;
-                    l = yCache[radius - j] * _width;
-                    m = yCache[radius + j] * _width;
-                    nodes[k++] = l + xCache[first];
-                    nodes[k++] = l + xCache[last];
-                    nodes[k++] = m + xCache[first];
-                    nodes[k++] = m + xCache[last];
+                    l = (_size + l - _width) % _size;
+                    m = (m + _width) % _size;
+                    nodes[k++] = l + xMin;
+                    nodes[k++] = l + xMax;
+                    nodes[k++] = m + xMin;
+                    nodes[k++] = m + xMax;
                 }
                 // all nodes in topmost and bottommost row
                 if(removeLast) {
-                    last--;
+                    if(xMax > 0) xMax--;
+                    else xMax = _width - 1;
                 } else {
-                    first++;
+                    xMin = ++xMin % _width;
                 }
-                l = yCache[radius - j] * _width;
-                m = yCache[radius + j] * _width;
-                for(i = first; i <= last; i++) {
-                    nodes[k++] = l + xCache[i];
-                    nodes[k++] = m + xCache[i];
+                l = (_size + l - _width) % _size;
+                m = (m + _width) % _size;
+                if(xMin < xMax) {
+                    for(i = xMin; i <= xMax; i++) {
+                        nodes[k++] = l + i;
+                        nodes[k++] = m + i;
+                    }
+                } else {
+                    for(i = xMin; i < _width; i++) {
+                        nodes[k++] = l + i;
+                        nodes[k++] = m + i;
+                    }
+                    for(i = 0; i <= xMax; i++) {
+                        nodes[k++] = l + i;
+                        nodes[k++] = m + i;
+                    }
                 }
             }
         }
@@ -831,6 +863,14 @@ var Map = function(width, height) {
             for(i = 0; i < _size * 2; i++) {
                 _rawMap[_blockTextures + i] = texture;
             }
+        }
+    };
+
+    var initializeObjects = function() {
+        var i;
+        // simply wipe everything
+        for(i = 0; i < _size * 2; i++) {
+            _rawMap[_blockObjects + i] = 0;
         }
     };
 
@@ -939,6 +979,41 @@ var Map = function(width, height) {
             && !!(TEXTURE_INFO[bottomRight].FLAG & flags);
     };
 
+    var isMixedTextureWithAllOfFlags = function(index, flags) {
+        var nodes,
+            topLeft,
+            top,
+            topRight,
+            bottomLeft,
+            bottom,
+            bottomRight;
+
+        if(_lastTextureIndex === index) {
+            topLeft = _lastTextureTopLeft;
+            top = _lastTextureTop;
+            topRight = _lastTextureTopRight;
+            bottomLeft = _lastTextureBottomLeft;
+            bottom = _lastTextureBottom;
+            bottomRight = _lastTextureBottomRight;
+        } else {
+            nodes = getTextureNodesByIndex(index);
+            _lastTextureIndex = index;
+            _lastTextureTopLeft     = topLeft     = _rawMap[_blockTextures + nodes.topLeft    ] & TEXTURE.TO_ID_VALUE;
+            _lastTextureTop         = top         = _rawMap[_blockTextures + nodes.top        ] & TEXTURE.TO_ID_VALUE;
+            _lastTextureTopRight    = topRight    = _rawMap[_blockTextures + nodes.topRight   ] & TEXTURE.TO_ID_VALUE;
+            _lastTextureBottomLeft  = bottomLeft  = _rawMap[_blockTextures + nodes.bottomLeft ] & TEXTURE.TO_ID_VALUE;
+            _lastTextureBottom      = bottom      = _rawMap[_blockTextures + nodes.bottom     ] & TEXTURE.TO_ID_VALUE;
+            _lastTextureBottomRight = bottomRight = _rawMap[_blockTextures + nodes.bottomRight] & TEXTURE.TO_ID_VALUE;
+        }
+
+        return ((TEXTURE_INFO[topLeft    ].FLAG
+            | TEXTURE_INFO[top        ].FLAG
+            | TEXTURE_INFO[topRight   ].FLAG
+            | TEXTURE_INFO[bottomLeft ].FLAG
+            | TEXTURE_INFO[bottom     ].FLAG
+            | TEXTURE_INFO[bottomRight].FLAG) & flags) === flags;
+    };
+
     // will replace a texture if any of it's flags matches with the flags
     var replaceTextureAnyOfFlags = function(index, texture, flags) {
         var nodes;
@@ -991,10 +1066,12 @@ var Map = function(width, height) {
         getTextureNodesByIndex: getTextureNodesByIndex,
         getTexturesByIndex: getTexturesByIndex,
         initializeHeight: initializeHeight,
+        initializeObjects: initializeObjects,
         initializeTexture: initializeTexture,
         isAnyTextureWithAnyOfFlags: isAnyTextureWithAnyOfFlags,
         isEachTextureSame: isEachTextureSame,
         isEachTextureWithAnyOfFlags: isEachTextureWithAnyOfFlags,
+        isMixedTextureWithAllOfFlags: isMixedTextureWithAllOfFlags,
         replaceTextureAnyOfFlags: replaceTextureAnyOfFlags,
         setTexture: setTexture
     };

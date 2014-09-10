@@ -5,28 +5,10 @@
 
 var React = require('react'),
     Generator = require('./generator'),
-    Compatibility = require('./components/compatibility.jsx');
+    Compatibility = require('./components/compatibility.jsx'),
+    IncDec = require('./components/inc-dec.jsx');
 
 var generator = new Generator();
-
-function generateSeed() {
-    generator.seed({
-        width: 256,
-        height: 256,
-        borderProtection: 8,
-        likelyhood: [
-            0,
-            4 / 1000,
-            24 / 1000,
-            640 / 1000,
-            480 / 1000,
-            480 / 1000,
-            480 / 1000
-        ],
-        massRatio: 50,
-        startingPoints: 60
-    });
-}
 
 function generateHeightMap() {
     generator.createHeight({
@@ -62,7 +44,25 @@ var App = React.createClass({
             compatibility: 'return-to-the-roots',
             players: [],
             resources: {},
-            viewType: 'light'
+            viewType: 'light',
+            seedOptions: {
+                width: 256,
+                height: 256,
+                borderProtection: 8,
+                likelyhood: [
+                    0,
+                    0.004,
+                    0.024,
+                    0.640,
+                    0.480,
+                    0.480,
+                    0.480
+                ],
+                massRatio: 50,
+                startingPoints: 60
+            },
+            height: 256,
+            width: 256
         }
     },
 
@@ -87,15 +87,20 @@ var App = React.createClass({
 
     handleSeed: function() {
         console.time('New Seed, Height Map, Textures and Resources');
-        generateSeed();
-        generateHeightMap();
-        generateTextures();
         this.setState({
-            players: [],
-            resources: generateAndGetResources()
+            width: this.state.seedOptions.width,
+            height: this.state.seedOptions.height
+        }, function() {
+            generator.seed(this.state.seedOptions);
+            generateHeightMap();
+            generateTextures();
+            this.setState({
+                players: [],
+                resources: generateAndGetResources()
+            });
+            console.timeEnd('New Seed, Height Map, Textures and Resources');
+            this.handleDraw();
         });
-        console.timeEnd('New Seed, Height Map, Textures and Resources');
-        this.handleDraw();
     },
 
     handleHeight: function() {
@@ -153,6 +158,14 @@ var App = React.createClass({
         });
     },
 
+    handleSetWidth: function(event) {
+        this.state.seedOptions.width = ~~event.target.value;
+    },
+
+    handleSetHeight: function(event) {
+        this.state.seedOptions.height = ~~event.target.value;
+    },
+
     render: function() {
         var gold = this.state.resources.mineGold || 0,
             coal = this.state.resources.mineCoal || 0,
@@ -178,7 +191,7 @@ var App = React.createClass({
         return <div>
             {/*<Compatibility onChange={this.handleCompatibility} value={this.state.compatibility} />*/}
             <div className="player-positions">
-                <canvas width="256" height="256" ref="canvas" className="settlers2-map settlers2-map--greenland"></canvas>
+                <canvas width={this.state.width} height={this.state.height} ref="canvas" className="settlers2-map settlers2-map--greenland"></canvas>
                 {players}
             </div>
             <p>
@@ -189,23 +202,56 @@ var App = React.createClass({
                 <button onClick={this.handlePlayers}>Randomize Players</button>
                 <button onClick={this.handleDownload}>Download</button>
             </p>
+            <dl className="generator-statistics">
+                <dt>Players:</dt>
+                <dd>{this.state.players.length}</dd>
+                <dt>Trees:</dt>
+                <dd>{this.state.resources.tree || 0}</dd>
+                <dt>Granite:</dt>
+                <dd>{this.state.resources.granite || 0}</dd>
+                <dt>Coal:</dt>
+                <dd>{Math.round(coal / mineTotal * 100, 1)} %</dd>
+                <dt>Iron ore:</dt>
+                <dd>{Math.round(ironOre / mineTotal * 100, 1)} %</dd>
+                <dt>Gold:</dt>
+                <dd>{Math.round(gold / mineTotal * 100, 1)} %</dd>
+                <dt>Granite:</dt>
+                <dd>{Math.round(granite / mineTotal * 100, 1)} %</dd>
+            </dl>
             <p>
-                <dl className="generator-statistics">
-                    <dt>Players:</dt>
-                    <dd>{this.state.players.length}</dd>
-                    <dt>Trees:</dt>
-                    <dd>{this.state.resources.tree || 0}</dd>
-                    <dt>Granite:</dt>
-                    <dd>{this.state.resources.granite || 0}</dd>
-                    <dt>Coal:</dt>
-                    <dd>{Math.round(coal / mineTotal * 100, 1)} %</dd>
-                    <dt>Iron ore:</dt>
-                    <dd>{Math.round(ironOre / mineTotal * 100, 1)} %</dd>
-                    <dt>Gold:</dt>
-                    <dd>{Math.round(gold / mineTotal * 100, 1)} %</dd>
-                    <dt>Granite:</dt>
-                    <dd>{Math.round(granite / mineTotal * 100, 1)} %</dd>
-                </dl>
+                <label>
+                    Width:
+                    <select defaultValue="256" onChange={this.handleSetWidth}>
+                        <optgroup label="The Settlers II &amp; RttR">
+                            {[64, 80, 96, 112, 128, 144, 160, 176, 192, 208, 224, 240, 256].map(function(value) {
+                                return <option value={value}>{value}</option>
+                            })}
+                        </optgroup>
+                        <optgroup label="Return to the Roots only">
+                            {[320, 384, 448, 512, 640, 768, 1024].map(function(value) {
+                                return <option value={value}>{value}</option>
+                            })}
+                        </optgroup>
+                    </select>
+                </label>
+                <br />
+                <label>
+                    Height:
+                    <select defaultValue="256" onChange={this.handleSetHeight}>
+                        <optgroup label="The Settlers II &amp; RttR">
+                            {[64, 80, 96, 112, 128, 144, 160, 176, 192, 208, 224, 240, 256].map(function(value) {
+                                return <option value={value}>{value}</option>
+                            })}
+                        </optgroup>
+                        <optgroup label="Return to the Roots only">
+                            {[320, 384, 448, 512, 640, 768, 1024].map(function(value) {
+                                return <option value={value}>{value}</option>
+                            })}
+                        </optgroup>
+                    </select>
+                </label>
+                <br />
+                I do nothing yet: <IncDec minimumValue="1" maximumValue="999" value="500" onChange={function(){}} />
             </p>
         </div>
     }

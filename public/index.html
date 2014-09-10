@@ -11,51 +11,12 @@
 
     </head>
     <body>
-        <div id="app"></div>
         <h1>The Settlers II.net Map Generator</h1>
+        <p>UI refactor in progress. Sorry about that! There will be a temporary lack of features.</p>
+        <div id="app"></div>
+        <hr />
+        <p>OLD STUFF TO BE REMOVED</p>
         <p>Create random maps for <a href="http://www.gog.com/game/the_settlers_2_gold_edition">The Settlers II</a> and <a href="http://www.rttr.info/"><abbr title="Return to the Roots">RttR</abbr></a>!</p>
-        <section class="map-view-container">
-            <header>Map View</header>
-            <div class="player-positions">
-                <canvas id="view" class="settlers2-map" width="256" height="256"></canvas>
-                <i class="player-position" id="player0"></i>
-                <i class="player-position" id="player1"></i>
-                <i class="player-position" id="player2"></i>
-                <i class="player-position" id="player3"></i>
-                <i class="player-position" id="player4"></i>
-                <i class="player-position" id="player5"></i>
-                <i class="player-position" id="player6"></i>
-                <span title="Return to the Roots only!">
-                    <i class="player-position player-position-rttr" id="player7"></i>
-                    <i class="player-position player-position-rttr" id="player8"></i>
-                    <i class="player-position player-position-rttr" id="player9"></i>
-                </span>
-            </div><br />
-            <label>
-                Display as: 
-                <select id="viewType">
-                    <option value="seed">Seed</option>
-                    <option value="height">Height Map</option>
-                    <option value="light" selected>Light Map</option>
-                    <option value="pretty">Pretty</option>
-                </select>
-            </label>
-            <ul>
-                <li><strong>Title:</strong> <input id="title" maxlength="19" value="Unknown map" />
-                <li><strong>Players:</strong> <span id="player-count">0</span></li>
-            </ul>
-            <ol>
-                <li><button id="new-seed">New Seed</button></li>
-                <li><button id="update-height-map">Update Height Map</button></li>
-                <li><button id="update-texture">Update Textures</button></li>
-                <li><button id="randomize-players">Randomize Players</button></li>
-                <li><button id="apply-resources">Apply Resources</button></li>
-                <li>
-                    <small style="width:15em">Compatible with both Settlers II and RttR!</small>
-                    <button id="save">Download (<small style="font-weight:bold;color:red;">Beta Quality</small>)</button>
-                </li>
-            </ol>
-        </section>
         <div class="tabs">
   
             <div class="tab">

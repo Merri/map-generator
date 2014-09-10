@@ -88,6 +88,12 @@ var TEXTURE = {
     ROCK: 0x20,         // mines be here
     WET: 0x40,          // swamp and water
     EXTREME: 0x80,      // snow and lava
+    WATER: 0x100,       // water only!
+    STEPPE: 0x200,
+    SAVANNAH: 0x400,
+    MEADOW: 0x800,
+    MOUNT_MEADOW: 0x1000,
+
     IMPASSABLE: 0xC0,   // bitflag for matching WET and EXTREME for all areas that not usable for the player
 
     // for actual texture ID matching
@@ -99,7 +105,7 @@ var TEXTURE = {
 
 var TEXTURE_INFO = {
     0: {
-        FLAG: TEXTURE.SUPPORT_S2 | TEXTURE.SUPPORT_RTTR | TEXTURE.ARABLE | TEXTURE.HABITABLE,
+        FLAG: TEXTURE.SUPPORT_S2 | TEXTURE.SUPPORT_RTTR | TEXTURE.ARABLE | TEXTURE.HABITABLE | TEXTURE.SAVANNAH,
         NAME: {
             0: 'Savannah',
             1: 'Dark Steppe',
@@ -139,7 +145,7 @@ var TEXTURE_INFO = {
         }
     },
     5: {
-        FLAG: TEXTURE.SUPPORT_S2 | TEXTURE.SUPPORT_RTTR | TEXTURE.WET,
+        FLAG: TEXTURE.SUPPORT_S2 | TEXTURE.SUPPORT_RTTR | TEXTURE.WET | TEXTURE.WATER,
         NAME: {
             0: 'Water',
             1: 'Moor',
@@ -163,7 +169,7 @@ var TEXTURE_INFO = {
         }
     },
     8: {
-        FLAG: TEXTURE.SUPPORT_S2 | TEXTURE.SUPPORT_RTTR | TEXTURE.ARABLE | TEXTURE.HABITABLE,
+        FLAG: TEXTURE.SUPPORT_S2 | TEXTURE.SUPPORT_RTTR | TEXTURE.ARABLE | TEXTURE.HABITABLE | TEXTURE.MEADOW,
         NAME: {
             0: 'Meadow #1',
             1: 'Pasture #1',
@@ -171,7 +177,7 @@ var TEXTURE_INFO = {
         }
     },
     9: {
-        FLAG: TEXTURE.SUPPORT_S2 | TEXTURE.SUPPORT_RTTR | TEXTURE.ARABLE | TEXTURE.HABITABLE,
+        FLAG: TEXTURE.SUPPORT_S2 | TEXTURE.SUPPORT_RTTR | TEXTURE.ARABLE | TEXTURE.HABITABLE | TEXTURE.MEADOW,
         NAME: {
             0: 'Meadow #2',
             1: 'Pasture #2',
@@ -179,7 +185,7 @@ var TEXTURE_INFO = {
         }
     },
     10: {
-        FLAG: TEXTURE.SUPPORT_S2 | TEXTURE.SUPPORT_RTTR | TEXTURE.ARABLE | TEXTURE.HABITABLE,
+        FLAG: TEXTURE.SUPPORT_S2 | TEXTURE.SUPPORT_RTTR | TEXTURE.ARABLE | TEXTURE.HABITABLE | TEXTURE.MEADOW,
         NAME: {
             0: 'Meadow #3',
             1: 'Pasture #3',
@@ -211,7 +217,7 @@ var TEXTURE_INFO = {
         }
     },
     14: {
-        FLAG: TEXTURE.SUPPORT_S2 | TEXTURE.SUPPORT_RTTR | TEXTURE.ARABLE | TEXTURE.HABITABLE,
+        FLAG: TEXTURE.SUPPORT_S2 | TEXTURE.SUPPORT_RTTR | TEXTURE.ARABLE | TEXTURE.HABITABLE | TEXTURE.STEPPE,
         NAME: {
             0: 'Steppe',
             1: 'Light Steppe',
@@ -219,7 +225,7 @@ var TEXTURE_INFO = {
         }
     },
     15: {
-        FLAG: TEXTURE.SUPPORT_S2 | TEXTURE.SUPPORT_RTTR | TEXTURE.ARABLE | TEXTURE.HABITABLE,
+        FLAG: TEXTURE.SUPPORT_S2 | TEXTURE.SUPPORT_RTTR | TEXTURE.ARABLE | TEXTURE.HABITABLE | TEXTURE.MEADOW,
         NAME: {
             0: 'Flower Meadow',
             1: 'Flower Pasture',
@@ -243,7 +249,7 @@ var TEXTURE_INFO = {
         }
     },
     18: {
-        FLAG: TEXTURE.SUPPORT_S2 | TEXTURE.SUPPORT_RTTR | TEXTURE.HABITABLE,
+        FLAG: TEXTURE.SUPPORT_S2 | TEXTURE.SUPPORT_RTTR | TEXTURE.HABITABLE | TEXTURE.MOUNT_MEADOW,
         NAME: {
             0: 'Mountain Meadow',
             1: 'Alpine Pasture',
@@ -283,7 +289,7 @@ var TEXTURE_INFO = {
         }
     },
     34: {
-        FLAG: TEXTURE.SUPPORT_S2 | TEXTURE.HABITABLE,
+        FLAG: TEXTURE.SUPPORT_S2 | TEXTURE.HABITABLE | TEXTURE.MOUNT_MEADOW,
         NAME: {
             0: 'Mountain #2 (Habitable)',
             1: 'Mountain #2 (Habitable)',

@@ -315,8 +315,9 @@ var Generator = function() {
             }
         }
 
+        map.initializeObjects();
         map.calculateSiteMap();
-        
+
         // draw mountain texture
         if(options.mountainGenerate === 7) {
             for(i = 0; i < size; i++) {
@@ -543,7 +544,48 @@ var Generator = function() {
         for(i = 0; i < size; i++) {
             if(map.isAnyTextureWithAnyOfFlags(i, TEXTURE.ROCK)) {
                 map.replaceTextureAnyOfFlags(i, 0x12, TEXTURE.ARABLE);
+            } else if(map.isMixedTextureWithAllOfFlags(i, TEXTURE.WATER | TEXTURE.HABITABLE)) {
+                if(Math.random() < 0.5) {
+                    map.replaceTextureAnyOfFlags(i, 0x04, TEXTURE.WATER | TEXTURE.HABITABLE);
+                }
+            } else if(map.isMixedTextureWithAllOfFlags(i, TEXTURE.WATER | TEXTURE.ROCK)) {
+                map.replaceTextureAnyOfFlags(i, 0x12, TEXTURE.WATER | TEXTURE.ARID);
+            } else if(map.isMixedTextureWithAllOfFlags(i, TEXTURE.WATER | TEXTURE.MOUNT_MEADOW)) {
+                map.replaceTextureAnyOfFlags(i, 0x12, TEXTURE.WATER | TEXTURE.ARID | TEXTURE.HABITABLE);
             }
+        }
+
+        for(i = 0; i < size; i++) {
+            if(map.isMixedTextureWithAllOfFlags(i, TEXTURE.ARID | TEXTURE.ARABLE)) {
+                if(Math.random() < 0.75) {
+                    map.replaceTextureAnyOfFlags(i, 0x0E, TEXTURE.ARABLE);
+                }
+            }
+        }
+
+        for(i = 0; i < size; i++) {
+            if(map.isMixedTextureWithAllOfFlags(i, TEXTURE.STEPPE | TEXTURE.ARABLE)) {
+                if(Math.random() < 0.75) {
+                    map.replaceTextureAnyOfFlags(i, 0x00, TEXTURE.MEADOW);
+                }
+            } else if(map.isMixedTextureWithAllOfFlags(i, TEXTURE.WATER | TEXTURE.ARID)) {
+                if(Math.random() < 0.15) {
+                    map.setTexture(i, 0x0E);
+                }
+            } else if(map.isMixedTextureWithAllOfFlags(i, TEXTURE.STEPPE | TEXTURE.ARID)) {
+                if(Math.random() < 0.5) {
+                    map.setTexture(i, 0x0E);
+                }
+            } else if(map.isEachTextureSame(i, 0x03)) {
+                if(Math.random() < 0.05) {
+                    map.setTexture(i, 0x05);
+                }
+            }
+        }
+
+        var radiusNodes = map.getRadiusNodes(0, 1, 2, true);
+        for(i = 0; i < 12; i++) {
+            map.setTexture(radiusNodes[i], 0x10);
         }
 
         map.calculateSiteMap();
