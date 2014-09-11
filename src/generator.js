@@ -583,10 +583,10 @@ var Generator = function() {
             }
         }
 
-        var radiusNodes = map.getRadiusNodes(0, 1, 2, true);
+        /*var radiusNodes = map.getRadiusNodes(0, 1, 2, true);
         for(i = 0; i < 12; i++) {
             map.setTexture(radiusNodes[i], 0x10);
-        }
+        }*/
 
         map.calculateSiteMap();
     };

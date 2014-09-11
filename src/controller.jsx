@@ -10,16 +10,6 @@ var React = require('react'),
 
 var generator = new Generator();
 
-function generateHeightMap() {
-    generator.createHeight({
-        baseLevel: 5,
-        flatten: 1,
-        groundLevel: 3,
-        randomize: 0.25,
-        noiseOnWater: false
-    });
-}
-
 function generateTextures() {
     generator.createBaseTextures({
         mountainGenerate: 6,
@@ -75,6 +65,17 @@ var App = React.createClass({
         }.bind(this), this.handleSeed);
     },
 
+    generateHeightMap: function() {
+        //console.log(~~((this.state.seedOptions.width + this.state.seedOptions.height) * 0.01));
+        generator.createHeight({
+            baseLevel: ~~((this.state.seedOptions.width + this.state.seedOptions.height) * 0.01),
+            flatten: 1,
+            groundLevel: 3,
+            randomize: 0.25,
+            noiseOnWater: false
+        });
+    },
+
     handleDraw: function() {
         console.time('Draw');
         generator.draw({
@@ -87,12 +88,24 @@ var App = React.createClass({
 
     handleSeed: function() {
         console.time('New Seed, Height Map, Textures and Resources');
+        this.state.seedOptions.startingPoints =
+            (this.state.seedOptions.width + this.state.seedOptions.height) * 0.2;
+        this.state.seedOptions.likelyhood = [
+            0,
+            (this.state.seedOptions.width + this.state.seedOptions.height) * 0.000005 + 0.001,
+            (this.state.seedOptions.width + this.state.seedOptions.height) * 0.000015 + 0.010,
+            (this.state.seedOptions.width + this.state.seedOptions.height) * 0.0005 + 0.5,
+            (this.state.seedOptions.width + this.state.seedOptions.height) * 0.0002 + 0.4,
+            (this.state.seedOptions.width + this.state.seedOptions.height) * 0.0002 + 0.4,
+            (this.state.seedOptions.width + this.state.seedOptions.height) * 0.0002 + 0.4
+        ];
+        console.log(this.state.seedOptions);
         this.setState({
             width: this.state.seedOptions.width,
             height: this.state.seedOptions.height
         }, function() {
             generator.seed(this.state.seedOptions);
-            generateHeightMap();
+            this.generateHeightMap();
             generateTextures();
             this.setState({
                 players: [],
