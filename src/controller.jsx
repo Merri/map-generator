@@ -118,7 +118,7 @@ var App = React.createClass({
 
     handleHeight: function() {
         console.time('Height Map, Textures and Resources');
-        generateHeightMap();
+        this.generateHeightMap();
         generateTextures();
         this.setState({
             players: [],

@@ -219,16 +219,41 @@ var Generator = function() {
             for(x = 0; x < width; x++) {
                 value = seedMap[index];
                 if(value > 1) {
-                    around = map.getNodesByIndex(index);
-                    // calculate avarage around node
-                    i = Math.round((seedMap[around.left] +
-                        seedMap[around.right] +
-                        seedMap[around.topLeft] +
-                        seedMap[around.topRight] +
-                        seedMap[around.bottomLeft] +
-                        seedMap[around.bottomRight]) / 6);
-                    // go up or down
-                    map.changeHeight(x, y, ((value & 15) & (i & 15)) / 2, ~~((value - i) / 8));
+                    around = map.getRadiusNodes(x, y, 5);
+                    for(k = j = i = 0; i < around.length; i++) {
+                        if(seedMap[around[i]] > 1) {
+                            k += seedMap[around[i]];
+                            j++;
+                        } else {
+                            break;
+                        }
+                    }
+                    /*around = map.getNodesByIndex(index);
+                    i1 = seedMap[around.left];
+                    i2 = seedMap[around.right];
+                    i3 = seedMap[around.topLeft];
+                    i4 = seedMap[around.topRight];
+                    i5 = seedMap[around.bottomLeft];
+                    i6 = seedMap[around.bottomRight];
+                    i7 = (i1 > 1) + (i2 > 1) + (i3 > 1) + (i4 > 1) + (i5 > 1) + (i6 > 1);*/
+                    if(i > around.length - 6) {
+                        // calculate avarage around node
+                        //i = Math.round((i1 + i2 + i3 + i4 + i5 + i6) / i7);
+                        i = Math.round(k / j);
+                        // go up or down
+                        // MOUNTAIN RANGES
+                        //map.changeHeight(x, y, ((value & 15) & (i & 15)) / 2, ~~((value - i) / 8));
+                        // ROUGH
+                        //map.changeHeight(x, y, ((value & 15) | (i & 15)) / 4, ~~((value - i) / 6));
+                        // HILLS
+                        //map.changeHeight(x, y, ((value & 3) | (i & 3)) / 1.25, ~~((value - i + 3) / 7));
+                        // HUGE MOUNTAINS
+                        //map.changeHeight(x, y, (value - i) / 32, (value - i) > 0 ? (value & i & 81) + 1 : -((value & i & 5) - 1) / 2);
+                        // GIGANTIC MOUNTAINS
+                        //map.changeHeight(x, y, (value - i) / 24, (value - i) > 0 ? (value & i & 81) + 1 : -((value & i & 5) - 1) / 2);
+                        // OUT OF THIS WORLD MOUNTAINS
+                        map.changeHeight(x, y, Math.min((value - i) / 24, 1), (value - i) > 0 ? (value & i & 81) + 1 : -(value & i & 3) - 1);
+                    }
                 }
                 index++;
             }
