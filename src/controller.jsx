@@ -179,6 +179,10 @@ var App = React.createClass({
         this.state.seedOptions.height = ~~event.target.value;
     },
 
+    handleMassRatio: function(value) {
+        this.state.seedOptions.massRatio = ~~value;
+    },
+
     render: function() {
         var gold = this.state.resources.mineGold || 0,
             coal = this.state.resources.mineCoal || 0,
@@ -264,7 +268,8 @@ var App = React.createClass({
                     </select>
                 </label>
                 <br />
-                I do nothing yet: <IncDec minimumValue="1" maximumValue="999" value="500" onChange={function(){}} />
+                Target playable landmass%: <IncDec minimumValue="1" maximumValue="99"
+                value={this.state.seedOptions.massRatio} onChange={this.handleMassRatio} />
             </p>
         </div>
     }

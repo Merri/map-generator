@@ -55,17 +55,24 @@ module.exports = React.createClass({
 	},
 
 	handleChange: function(event) {
-		var value = ~~parseInt(event.target.value, 10);
-		if(value < this.props.minimumValue) {
-			value = this.state.value;
-		} else if(value > this.props.maximumValue) {
-			value = this.state.value;
+		var value = event.target.value;
+		if(value.length > 0) {
+			value = ~~parseInt(value, 10);
+			if(value < this.props.minimumValue) {
+				value = this.state.value;
+			} else if(value > this.props.maximumValue) {
+				value = this.state.value;
+			}
+			this.setState({
+				value: ''+value
+			}, function() {
+				this.props.onChange(value);
+			});
+		} else {
+			this.setState({
+				value: value
+			});
 		}
-		this.setState({
-			value: value
-		}, function() {
-			this.props.onChange(value);
-		});
 	},
 
 	render: function() {
