@@ -253,6 +253,7 @@ button {
 .inc-dec {
     border: 1px solid #464;
     display: inline-block;
+    line-height: 0.1;
 }
 
 .inc-dec__decrease,
@@ -263,8 +264,8 @@ button {
     line-height: 1.5;
     margin: 0;
     padding: 0;
-    vertical-align: middle;
-    width: 1em;
+    vertical-align: center;
+    width: 2em;
 }
 
 .inc-dec__input {
@@ -273,6 +274,40 @@ button {
     margin: 0;
     padding: 0;
     text-align: center;
-    vertical-align: middle;
-    width: 5em;
+    vertical-align: center;
+    width: 3em;
+}
+
+.settlers2-map-title {
+    background: transparent;
+    border: 1px dotted transparent;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    font-size: 2em;
+    font-weight: bold;
+    outline: none;
+    width: 100%;
+}
+
+.settlers2-map-title:hover {
+    background-color: rgba(255, 255, 255, 0.75);
+}
+
+.settlers2-map-title:focus {
+    background-color: #fffcf6;
+    border-color: #464;
+}
+
+.seed-options {
+    border: 1px solid #464;
+    float: left;
+    list-style: none;
+    margin: 0 1em;
+    padding: 0;
+}
+
+.seed-options > li {
+    background: #fffcf6;
+    margin: 2px;
+    padding: 2px;
 }

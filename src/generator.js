@@ -23,6 +23,7 @@ var Generator = function() {
         j,
         k,
         l,
+        areas,
         around,
         aroundExpandTo,
         baseLevel,
@@ -176,7 +177,7 @@ var Generator = function() {
                     }
                 }
                 if(value > 8) {}
-                else if(value === 8 && Math.random() <= likelyhood[1]) value = 256;
+                else if(value === 8 && Math.random() <= likelyhood[1]) value = 255;
                 else if(value === 7 && Math.random() <= likelyhood[2]) value = 56;
                 else if(value === 6 && Math.random() <= likelyhood[3]) value = 64;
                 else if(value === 5 && Math.random() <= likelyhood[4]) value = 72;
@@ -614,6 +615,11 @@ var Generator = function() {
         }*/
 
         map.calculateSiteMap();
+        areas = map.calculateAreaMap();
+    };
+
+    var getAreas = function() {
+        return areas;
     };
 
     var getRandomPlayerPositions = function(maxPlayerCount, radius) {
@@ -668,6 +674,7 @@ var Generator = function() {
         var i,
             j,
             k,
+            treeIndex,
             eachTextureIsSameKind,
             usableLandmass = 0,
             newResource,
@@ -795,13 +802,16 @@ var Generator = function() {
                     // see if we this location is free to use
                     if(data[touchBlock + k] === 0) {
                         // random here avoids getting stuck...
-                        if( (seedMap[k] & 0x03) || Math.random() < 0.2 ) {
+                        if( (seedMap[k] & 0x03) < 2 || Math.random() < 0.2 ) {
                             // mark done
                             data[touchBlock + k] = 1;
+                            treeIndex = ~~(Math.random() * 6);
+                            // skip through palm trees
+                            if(treeIndex > 2) treeIndex += 3;
                             // type
-                            data[objectTypeBlock + k] = 0xC4;
+                            data[objectTypeBlock + k] = 0xC4 | (treeIndex >> 2);
                             // Pine / Birch / Oak / Palm 1
-                            data[objectIndexBlock + k] = 0x30 + (~~(Math.random() * 4) * 0x40) + (~~(Math.random() * 0x08));
+                            data[objectIndexBlock + k] = 0x30 | ((treeIndex & 3) * 0x40) | (~~(Math.random() * 0x08));
                             // increase counter
                             resources.tree++;
                             usableLandmass--;
@@ -824,7 +834,7 @@ var Generator = function() {
                     // see if we this location is free to use
                     if(data[touchBlock + k] === 0) {
                         // random here avoids getting stuck...
-                        if( (seedMap[k] & 0x03) || Math.random() < 0.2 ) {
+                        if( (seedMap[k] & 0x03) < 2 || Math.random() < 0.2 ) {
                             // mark done
                             data[touchBlock + k] = 1;
                             // type
@@ -867,11 +877,33 @@ var Generator = function() {
         options.terrain = ~~options.terrain || TERRAIN.GREENLAND;
 
         switch(viewType) {
+        case 0:
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+        case 5:
+        case 6:
+        case 7:
+        case 8:
+        case 9:
+        case 10:
+        case 11:
+        case 12:
+        case 13:
+        case 14:
+            for(i = size * viewType, j = 0, k = i + size; i < k; i++) {
+                view[j++] = data[i];
+                view[j++] = data[i];
+                view[j++] = data[i];
+                view[j++] = 255;
+            }
+            break;
         case 'seed':
             for(i = 0, j = 0; i < size; i++) {
-                view[j++] = seedMap[i];
-                view[j++] = seedMap[i];
-                view[j++] = seedMap[i];
+                view[j++] = 255 - seedMap[i];
+                view[j++] = 255 - seedMap[i];
+                view[j++] = 255 - seedMap[i];
                 view[j++] = 255;
             }
 
@@ -881,32 +913,113 @@ var Generator = function() {
                 view[(i << 2) + 2] = 255;
             });
             break;
-        case 'height':
-            for(i = 0, j = 0; i < size; i++) {
-                if(data[i] === baseLevel && seedMap[i] < 2) {
-                    view[j++] = 80;
-                    view[j++] = 160;
-                    view[j++] = 192;
-                } else {
-                    view[j++] = data[i] << 2;
-                    view[j++] = data[i] << 2;
-                    view[j++] = data[i] << 2;
+        case 'fast':
+            var color = colors[options.terrain].data,
+                // row information so we can do some graphical adjustments
+                y = -1,
+                texture_color_merri = COLOR.MERRI[options.terrain],
+                texture_color_original = COLOR.ORIGINAL[options.terrain],
+                treeIndex, g, g2, c1, c2, c3, c4, c5, c6, c7, c8, c9, cA, cB, cC, j,
+                color1, color2, color3, colorAlpha,
+                drawNodes,
+                leftNodes,
+                textures,
+                texturesBlock = size,
+                objectIndexBlock = size * 4,
+                objectTypeBlock = size * 5,
+                drawPos = 0;
+    
+            // and then we just loop through!
+            for(i = 0; i < size; i++) {
+                // keep track of current row
+                if( i % width === 0) y++;
+                // mark as nothing drawn yet
+                color1 = void 0;
+                // not done yet! check for objects!
+                switch(data[objectTypeBlock + i]) {
+                // trees
+                case 196:
+                case 197:
+                case 198:
+                case 199:
+                    treeIndex = ((data[objectTypeBlock + i] & 2) << 2) | ((data[objectIndexBlock + i] & 0xC0) >> 6);
+                    // these colors are from screenshot of Map Editor / S2EDIT.EXE
+                    // FYI: tree indexes with color are 0, 1, 2, 6, 7, 8, 12, 13, 14, 18, 19, 20
+                    // the other half are not painted on the map
+                    switch((treeIndex % 6) + options.terrain * 6) {
+                    // GREENLAND 
+                    case 0:
+                        color1 = 0;
+                        color2 = 73;
+                        color3 = 18;
+                        break;
+                    case 1:
+                        color1 = 6;
+                        color2 = 93;
+                        color3 = 15;
+                        break;
+                    case 2:
+                        color1 = 0;
+                        color2 = 51;
+                        color3 = 19;
+                        break;
+                    // WASTELAND
+                    case 6:
+                        color1 = 69;
+                        color2 = 59;
+                        color3 = 18;
+                        break;
+                    case 7:
+                        color1 = 69;
+                        color2 = 67;
+                        color3 = 42;
+                        break;
+                    case 8:
+                        color1 = 0;
+                        color2 = 51;
+                        color3 = 19;
+                        break;
+                    // WINTER WORLD
+                    case 12:
+                        color1 = 25;
+                        color2 = 64;
+                        color3 = 0;
+                        break;
+                    case 13:
+                        color1 = 41;
+                        color2 = 86;
+                        color3 = 0;
+                        break;
+                    case 14:
+                        color1 = 14;
+                        color2 = 41;
+                        color3 = 0;
+                        break;
+                    // NOTHING DRAWN ON MAP, these trees do not have a color
+                    default:
+                    }
+                    break;
+                // granite
+                case 204:
+                case 205:
+                    //color1 = 134;
+                    //color2 = 122;
+                    //color3 = 103;
+                    break;
                 }
-                view[j++] = 255;
-            }
-            break;
-        case 'light':
-            for(i = 0, j = 0; i < size; i++) {
-                if(data[i] === baseLevel && seedMap[i] < 2) {
-                    view[j++] = data[lightMapBlock + i] * 0.25 + 40;
-                    view[j++] = data[lightMapBlock + i] * 0.75 + 80;
-                    view[j++] = data[lightMapBlock + i] * 0.85 + 96;
-                } else {
-                    view[j++] = data[lightMapBlock + i] * 0.9 + 48;
-                    view[j++] = data[lightMapBlock + i] * 1.1 + 32;
-                    view[j++] = data[lightMapBlock + i] * 0.5 + 32;
+
+                if(color1 === void 0) {
+                    g = ~~((data[lightMapBlock + i] / 128) * 255);
+                    c1 = (g + 256 * texture_color_original[data[texturesBlock + i] & 0x3F]) * 4;
+                    color1 = color[c1++];
+                    color2 = color[c1++];
+                    color3 = color[c1++];
                 }
-                view[j++] = 255;
+
+                view[drawPos++] = color1;
+                view[drawPos++] = color2;
+                view[drawPos++] = color3;
+                view[drawPos++] = 255;
             }
             break;
         case 'pretty':
@@ -998,6 +1111,17 @@ var Generator = function() {
         buffer.putImageData(image, 0, 0);
     }
 
+    function sanitizeStringAsCP437(text) {
+        var output = '',
+            code;
+        for(i = 0; i < text.length; i++) {
+            code = CP437.indexOf(~~text.charCodeAt(i));
+            if(code > -1) output += text[i];
+            else output += String.fromCharCode(CP437[0xDB]);
+        }
+        return output;
+    }
+
     function veryInefficientStringToCP437(text, length) {
         var output = [],
             code;
@@ -1013,8 +1137,7 @@ var Generator = function() {
         // 2577 => header 2352
         //       + block headers 16 * 14 = 224
         //       + footer 0xFF
-        var areas,
-            buffer = new ArrayBuffer(2577 + size * 14),
+        var buffer = new ArrayBuffer(2577 + size * 14),
             view = new DataView(buffer),
             byteView = void 0,
             pos = 0,
@@ -1133,9 +1256,6 @@ var Generator = function() {
         view.setUint8(pos++, 4);
         view.setUint8(pos++, 7);
 
-        // GET AREAS
-        areas = map.calculateAreaMap();
-
         // SET AREAS
         for(i = 0; i < Math.min(areas.length, 250); i++) {
             view.setUint8(pos++, areas[i].type);
@@ -1247,11 +1367,13 @@ var Generator = function() {
         createBaseTextures: createBaseTextures,
         createHeight: createHeight,
         draw: draw,
+        getAreas: getAreas,
         getFileBlob: getFileBlob,
         getRandomPlayerPositions: getRandomPlayerPositions,
         isReadyToDraw: isReadyToDraw,
         seed: seed,
-        setColorMap: setColorMap
+        setColorMap: setColorMap,
+        sanitizeStringAsCP437: sanitizeStringAsCP437
     };
 };
 
