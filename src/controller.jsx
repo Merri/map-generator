@@ -34,8 +34,8 @@ var App = React.createClass({
                 noiseOnWater: false
             },
             seedOptions: {
-                width: 256,
-                height: 256,
+                width: 160,
+                height: 160,
                 borderProtection: 8,
                 likelyhood: [
                     0,
@@ -56,8 +56,8 @@ var App = React.createClass({
                 texture: 8,
                 waterTexture: 5
             },
-            height: 256,
-            width: 256,
+            height: 160,
+            width: 160,
             title: 'Untitled'
         }
     },
