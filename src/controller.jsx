@@ -10,10 +10,6 @@ var React = require('react'),
 
 var generator = new Generator();
 
-function getRandomizedPlayers() {
-    return generator.getRandomPlayerPositions(7, 80);
-}
-
 function generateAndGetResources() {
     return generator.applyResources({});
 }
@@ -23,6 +19,8 @@ var App = React.createClass({
         return {
             hasLocalStorage: false,
             compatibility: 'return-to-the-roots',
+            maxPlayers: 7,
+            playerMinDistance: 50,
             players: [],
             resources: {},
             viewType: 11,
@@ -174,7 +172,7 @@ var App = React.createClass({
     handlePlayers: function() {
         console.time('Players');
         this.setState({
-            players: getRandomizedPlayers()
+            players: generator.getRandomPlayerPositions(this.state.maxPlayers, this.state.playerMinDistance)
         });
         console.timeEnd('Players');
         this.handleDraw();
@@ -253,6 +251,12 @@ var App = React.createClass({
         }
     },
 
+    handlePlayerMinDistance: function(value) {
+        this.setState({
+            playerMinDistance: ~~value
+        });
+    },
+
     handleNoiseOnWater: function(event) {
         console.log(event.target.checked);
         this.state.heightOptions.noiseOnWater = event.target.checked;
@@ -291,6 +295,12 @@ var App = React.createClass({
             el.blur();
             // and then get right back in
             el.focus();
+        });
+    },
+
+    handleMaxPlayerChange: function(event) {
+        this.setState({
+            maxPlayers: ~~event.target.value
         });
     },
 
@@ -454,11 +464,32 @@ var App = React.createClass({
                         </label>
                     </dd>
                 </dl>
+                <p>
+                    <button onClick={this.handleResources}>Randomize Resources</button>
+                </p>
             </section>
-            <p>
-                <button onClick={this.handleResources}>Randomize Resources</button>
-                <button onClick={this.handlePlayers}>Randomize Players</button>
-            </p>
+            <section>
+                <header>Player Options</header>
+                <dl>
+                    <dt>Maximum number of players:</dt>
+                    <dd>
+                        {['None', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten'].map(function(text, index) {
+                            return <label>
+                                <input name="max-players" type="radio" value={index} checked={this.state.maxPlayers === index}
+                                onChange={this.handleMaxPlayerChange} /> {text}
+                            </label>;
+                        }.bind(this))}
+                    </dd>
+                    <dt>Minimum player distance:</dt>
+                    <dd>
+                        <IncDec minimumValue="15" maximumValue="150"
+                        value={''+(this.state.playerMinDistance)} onChange={this.handlePlayerMinDistance} />
+                    </dd>
+                </dl>
+                <p>
+                    <button onClick={this.handlePlayers}>Randomize Players</button>
+                </p>
+            </section>
             <dl className="generator-statistics">
                 <dt>Players:</dt>
                 <dd>{this.state.players.length}</dd>
