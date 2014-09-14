@@ -280,6 +280,20 @@ var App = React.createClass({
         return this.state.width > 256 || this.state.height > 256 || areas.length > 250;
     },
 
+    // This hack works around Firefox's issue with not triggering onChange when value changes.
+    // The bug was reported in 2002 and it's still not fixed by 2014.
+    // Quite religious take on W3C's brain fart! https://bugzilla.mozilla.org/show_bug.cgi?id=126379
+    handleFirefoxOnChangeInKeyDown: function(event) {
+        var el = event.target;
+        // we have to delay because onKeyDown triggers before the value has changed
+        setTimeout(function() {
+            // onChange event triggers when blur is called...
+            el.blur();
+            // and then get right back in
+            el.focus();
+        });
+    },
+
     render: function() {
         var gold = this.state.resources.mineGold || 0,
             coal = this.state.resources.mineCoal || 0,
@@ -343,7 +357,8 @@ var App = React.createClass({
             </div>
             <ul className="seed-options">
                 <li>
-                    <label>Width: <select value={this.state.seedOptions.width} onChange={this.handleSetWidth}>
+                    <label>Width: <select value={this.state.seedOptions.width} onChange={this.handleSetWidth}
+                    onKeyDown={this.handleFirefoxOnChangeInKeyDown}>
                         <optgroup label="The Settlers II &amp; RttR">
                             {[64, 80, 96, 112, 128, 144, 160, 176, 192, 208, 224, 240, 256].map(function(value) {
                                 return <option value={value}>{value}</option>
@@ -357,7 +372,8 @@ var App = React.createClass({
                     </select></label>
                 </li>
                 <li>
-                    <label>Height: <select value={this.state.seedOptions.height} onChange={this.handleSetHeight}>
+                    <label>Height: <select value={this.state.seedOptions.height} onChange={this.handleSetHeight}
+                    onKeyDown={this.handleFirefoxOnChangeInKeyDown}>
                         <optgroup label="The Settlers II &amp; RttR">
                             {[64, 80, 96, 112, 128, 144, 160, 176, 192, 208, 224, 240, 256].map(function(value) {
                                 return <option value={value}>{value}</option>
@@ -381,7 +397,8 @@ var App = React.createClass({
             <br style={{clear:'both'}} />
             <p>
                 <label>Display:
-                    <select value={this.state.viewType} onChange={this.handleViewTypeChange}>
+                    <select value={this.state.viewType} onChange={this.handleViewTypeChange}
+                    onKeyDown={this.handleFirefoxOnChangeInKeyDown}>
                         <optgroup label="World">
                             <option value="fast">Settlers II (fast)</option>
                             <option value="pretty">Detailed (slow)</option>
@@ -404,7 +421,8 @@ var App = React.createClass({
                 <dl>
                     <dt>Environment:</dt>
                     <dd>
-                        <select value={this.state.textureOptions.terrain} onChange={this.handleTerrain}>
+                        <select value={this.state.textureOptions.terrain} onChange={this.handleTerrain}
+                        onKeyDown={this.handleFirefoxOnChangeInKeyDown}>
                             <option value="0">Greenland</option>
                             <option value="1">Wasteland</option>
                             <option value="2">Winter World</option>
