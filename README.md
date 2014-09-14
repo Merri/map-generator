@@ -11,11 +11,10 @@ See the [TODO list](https://github.com/Merri/map-generator/wiki) @ wiki.
 Setting up development environment
 ----------------------------------
 
-Just clone to your preferred git project location. You need Node and also the following.
+Just clone to your preferred git project location. You need Node and a local webserver to serve the `public/index.html` file (you can also just open the file in browser, but accessing images has cross-origin protection so map render features are more limited).
 
-	npm install -g browserify
-	npm install -g watchify
+To get started with development itself:
 
-After this you should be able to run continuous preprocessing by typing `npm start`. JavaScript is processed on the fly.
+	npm install
 
-*TODO*: figure out build and dev switch
+After running this you should have the dev environment running and be able to run continuous preprocessing by typing `npm start`. JavaScript is processed on the fly into `public/bundle.js`. Once you're done you should do `npm run build` to compile the production version.
