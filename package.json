@@ -4,7 +4,7 @@
   "description": "Generates maps for The Settlers II, Return to the Roots and The Settlers II Anniversary Edition",
   "version": "0.3.0",
   "scripts": {
-    "build": "browserify -e ./src/controller.jsx -t reactify -d -p [minifyify --map bundle.map.json --output ./public/bundle.map.json] -o ./public/bundle.js",
+    "build": "rm ./public/bundle.js && browserify -e ./src/controller.jsx -t reactify -d -p [minifyify --map bundle.map.json --output ./public/bundle.map.json] -o ./public/bundle.js && gzip -vfc9 ./public/bundle.js >> ./public/bundle.js.gz",
     "start": "watchify -e ./src/controller.jsx -t reactify -d -p [minifyify --map bundle.map.json --output ./public/bundle.map.json] -o ./public/bundle.js -v",
     "uglify": "browserify -e ./src/controller.jsx -t reactify -g uglifyify -o ./public/bundle.js"
   },
