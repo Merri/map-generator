@@ -156,6 +156,8 @@ var Generator = function() {
             }
         }*/
 
+        var expander = 7;
+
         // do the land expansion
         if(mass > 0) {
             while(mass < massRatio) {
@@ -173,17 +175,19 @@ var Generator = function() {
                         if(seedMap[around.bottomLeft] > 1) total++;
                         if(seedMap[around.bottomRight] > 1) total++;
 
-                        if(Math.random() <= likelyhood[total]) expandTo(index, ~~(value / 7 * total) + 2, i);
+                        if(Math.random() <= likelyhood[total]) {
+                            if(expander > 0) {
+                                expandTo(index, ~~(value / expander * total) + 2, i);
+                            } else {
+                                expandTo(index, ~~(value * (1 + -expander / 20) * total) + 2, i);
+                            }
+                        }
                     }
                 }
-                if(value > 8) {}
-                else if(value === 8 && Math.random() <= likelyhood[1]) value = 255;
-                else if(value === 7 && Math.random() <= likelyhood[2]) value = 56;
-                else if(value === 6 && Math.random() <= likelyhood[3]) value = 64;
-                else if(value === 5 && Math.random() <= likelyhood[4]) value = 72;
-                else if(value === 4 && Math.random() <= likelyhood[5]) value = 80;
-                else if(value === 3 && Math.random() <= likelyhood[6]) value = 96;
-                else /*if(value === 2) */value = 128;
+                if(value === 2) {
+                    expander--;
+                    value = 3;
+                }
             }
         }
     };
