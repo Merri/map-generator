@@ -82,11 +82,8 @@ html {
 
 body {
     background: #F9F6EE;
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
     margin: 0 auto;
     max-width: 1000px;
-    padding: 1em;
 }
 
 a:focus {
@@ -104,11 +101,7 @@ hr {
 .generator-header h1 {
     background: url('http://settlers2.net/wp-content/uploads/2011/09/header_s2.jpg') repeat-x 50% 0%;
     box-shadow: inset 0 0 8px black;
-    color: #EECC00;
-    font-weight: normal;
-    margin: -16px -16px 0;
-    margin: -1rem -1rem 0;
-    text-shadow: -2px 2px 1px black, 0 0 .5em white;
+    margin: 0;
 }
 
 .generator-header h1 span {
@@ -122,29 +115,43 @@ hr {
 }
 
 .generator-header h1 em {
-    background: rgba(255, 255, 255, .25);
-    display: inline-block;
+    color: #EECC00;
+    display: block;
     font-style: normal;
     line-height: 1;
-    padding: 4px;
-    padding: 0.25rem;
+    padding: 0.25em 0 0 1.75em;
+    text-shadow: -3px 1px 0 black, 0 0 .5em black;
 }
 
+.generator-footer p,
 .generator-header p {
     background: #222;
     color: #f9f9f9;
-    margin: 0 -1em;
+    margin: 0;
     padding: 1em;
 }
 
+.generator-footer a:link,
+.generator-footer a:visited,
 .generator-header a:link,
 .generator-header a:visited {
     color: inherit;
+    font-style: italic;
     text-decoration: none;
 }
 
+.generator-footer a:hover,
 .generator-header a:hover {
     text-decoration: underline;
+}
+
+.generator-header__old-version {
+    float: right;
+    padding: 1em 1em 0 0;
+}
+
+.generator-main {
+    padding: 1em;
 }
 
 label {
