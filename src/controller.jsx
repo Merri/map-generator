@@ -352,8 +352,10 @@ var App = React.createClass({
         return <div>
             {/*<Compatibility onChange={this.handleCompatibility} value={this.state.compatibility} />*/}
             <p>
-                <input className="settlers2-map-title" type="text" maxLength="19" value={this.state.title}
-                onChange={this.handleTitleChange} placeholder="Title (19 chars in CP-437)" />
+                <span className="input-container" data-chars-remaining={19 - this.state.title.length}>
+                    <input className="settlers2-map-title" type="text" maxLength="19" value={this.state.title}
+                    onChange={this.handleTitleChange} placeholder="Title" />
+                </span>
                 <br />
                 <button onClick={this.handleDownload}>Download</button> <small className="settlers2-playable-on">
                 Map is playable on {this.isRttROnly(totalAreas)
