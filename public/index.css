@@ -117,10 +117,17 @@ hr {
 .generator-header h1 em {
     color: #EECC00;
     display: block;
+    font-family: 'UnifrakturCook', sans-serif;
     font-style: normal;
     line-height: 1;
     padding: 0.25em 0 0 1.75em;
-    text-shadow: -3px 1px 0 black, 0 0 .5em black;
+    text-shadow: -3px 1px 0 black,
+        0 0 .5em black,
+        -1px 0 #730,
+        0 -1px #730,
+        1px 0 #730,
+        0 1px #730;
+    -webkit-text-stroke: 1px #730;
 }
 
 .generator-footer p,
