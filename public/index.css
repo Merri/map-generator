@@ -115,7 +115,7 @@ hr {
 }
 
 .generator-header h1 em {
-    color: #EECC00;
+    color: #D99E00;
     display: block;
     font-family: 'UnifrakturCook', sans-serif;
     font-style: normal;
@@ -127,15 +127,40 @@ hr {
         0 -1px #730,
         1px 0 #730,
         0 1px #730;
+}
+
+.generator-header h1 em:before {
+    color: transparent;
+    content: 'Map Generator';
+    background: -webkit-linear-gradient(top, #C06800 0%, #F2D300 44%, #FFF 50%, #FFFF40 51%, #F2D300 57%, #C06800 100%);
+    -webkit-background-clip: text;
+    -webkit-pointer-events: none;
+    -moz-pointer-events: none;
+    -ms-pointer-events: none;
+    pointer-events: none;
+    position: absolute;
+    text-shadow: none;
     -webkit-text-stroke: 1px #730;
+}
+
+.generator-header h1 em:hover:before {
+    text-shadow: 0 0 1px rgba(255, 255, 255, 0.5);
+}
+
+.generator-facebook {
+    float: right;
+    padding: 1em;
 }
 
 .generator-footer p,
 .generator-header p {
     background: #222;
-    color: #f9f9f9;
     margin: 0;
     padding: 1em;
+}
+
+.generator-dark {
+    color: #f9f9f9;
 }
 
 .generator-footer a:link,
