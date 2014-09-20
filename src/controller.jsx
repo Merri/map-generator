@@ -6,7 +6,8 @@
 var React = require('react'),
     Generator = require('./generator'),
     Compatibility = require('./components/compatibility.jsx'),
-    IncDec = require('./components/inc-dec.jsx');
+    IncDec = require('./components/inc-dec.jsx'),
+    TextureOption = require('./components/texture-option.jsx');
 
 var generator = new Generator();
 
@@ -258,7 +259,6 @@ var App = React.createClass({
     },
 
     handleNoiseOnWater: function(event) {
-        console.log(event.target.checked);
         this.state.heightOptions.noiseOnWater = event.target.checked;
         this.handleLandscape();
     },
@@ -302,6 +302,16 @@ var App = React.createClass({
         this.setState({
             maxPlayers: ~~event.target.value
         });
+    },
+
+    handlePlayableTexture: function(value) {
+        this.state.textureOptions.texture = value;
+        this.handleLandscape();
+    },
+
+    handleUnPlayableTexture: function(value) {
+        this.state.textureOptions.waterTexture = value;
+        this.handleLandscape();
     },
 
     render: function() {
@@ -464,6 +474,22 @@ var App = React.createClass({
                             <input type="checkbox" checked={this.state.heightOptions.noiseOnWater}
                             onChange={this.handleNoiseOnWater} /> Use also on unplayable areas? (water, lava, etc.)
                         </label>
+                    </dd>
+                    <dt>Default playable area terrain:</dt>
+                    <dd>
+                        <TextureOption
+                        terrain={this.state.textureOptions.terrain}
+                        texture={this.state.textureOptions.texture}
+                        textures={[14, 0, 8, 9, 10, 15, 18, 34, 6]}
+                        onChange={this.handlePlayableTexture} />
+                    </dd>
+                    <dt>Default unplayable area terrain:</dt>
+                    <dd>
+                        <TextureOption
+                        terrain={this.state.textureOptions.terrain}
+                        texture={this.state.textureOptions.waterTexture}
+                        textures={[5, 2, 3, 4, 16, 7, 17, 19, 20, 21, 22]}
+                        onChange={this.handleUnPlayableTexture} />
                     </dd>
                 </dl>
                 <p>

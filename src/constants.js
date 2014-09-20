@@ -110,7 +110,11 @@ var TEXTURE_INFO = {
             0: 'Savannah',
             1: 'Dark Steppe',
             2: 'Taiga'
-        }
+        },
+        X: 0,
+        Y: 96,
+        WIDTH: 37,
+        HEIGHT: 31
     },
     1: {
         FLAG: TEXTURE.SUPPORT_S2 | TEXTURE.SUPPORT_RTTR | TEXTURE.ROCK,
@@ -118,7 +122,11 @@ var TEXTURE_INFO = {
             0: 'Mountain #1',
             1: 'Mountain #1',
             2: 'Mountain #1'
-        }
+        },
+        X: 0,
+        Y: 48,
+        WIDTH: 37,
+        HEIGHT: 31
     },
     2: {
         FLAG: TEXTURE.SUPPORT_S2 | TEXTURE.SUPPORT_RTTR | TEXTURE.EXTREME,
@@ -126,7 +134,11 @@ var TEXTURE_INFO = {
             0: 'Snow',
             1: 'Lava Stones',
             2: 'Pack Ice'
-        }
+        },
+        X: 0,
+        Y: 0,
+        WIDTH: 37,
+        HEIGHT: 31
     },
     3: {
         FLAG: TEXTURE.SUPPORT_S2 | TEXTURE.SUPPORT_RTTR | TEXTURE.WET,
@@ -134,7 +146,11 @@ var TEXTURE_INFO = {
             0: 'Swamp',
             1: 'Lava Ground',
             2: 'Drift Ice'
-        }
+        },
+        X: 96,
+        Y: 0,
+        WIDTH: 37,
+        HEIGHT: 31
     },
     4: {
         FLAG: TEXTURE.SUPPORT_S2 | TEXTURE.SUPPORT_RTTR | TEXTURE.ARID,
@@ -142,7 +158,11 @@ var TEXTURE_INFO = {
             0: 'Desert',
             1: 'Wasteland',
             2: 'Ice'
-        }
+        },
+        X: 48,
+        Y: 0,
+        WIDTH: 37,
+        HEIGHT: 31
     },
     5: {
         FLAG: TEXTURE.SUPPORT_S2 | TEXTURE.SUPPORT_RTTR | TEXTURE.WET | TEXTURE.WATER,
@@ -150,7 +170,11 @@ var TEXTURE_INFO = {
             0: 'Water',
             1: 'Moor',
             2: 'Water'
-        }
+        },
+        X: 201,
+        Y: 59,
+        WIDTH: 37,
+        HEIGHT: 31
     },
     6: {
         FLAG: TEXTURE.SUPPORT_S2 | TEXTURE.HABITABLE,
@@ -158,7 +182,11 @@ var TEXTURE_INFO = {
             0: 'Habitable Water',
             1: 'Habitable Moor',
             2: 'Habitable Water'
-        }
+        },
+        X: 201,
+        Y: 59,
+        WIDTH: 37,
+        HEIGHT: 31
     },
     7: {
         FLAG: TEXTURE.SUPPORT_S2 | TEXTURE.SUPPORT_RTTR | TEXTURE.ARID,
@@ -166,7 +194,11 @@ var TEXTURE_INFO = {
             0: 'Clone Desert',
             1: 'Clone Wasteland',
             2: 'Clone Ice'
-        }
+        },
+        X: 48,
+        Y: 0,
+        WIDTH: 37,
+        HEIGHT: 31
     },
     8: {
         FLAG: TEXTURE.SUPPORT_S2 | TEXTURE.SUPPORT_RTTR | TEXTURE.ARABLE | TEXTURE.HABITABLE | TEXTURE.MEADOW,
@@ -174,7 +206,11 @@ var TEXTURE_INFO = {
             0: 'Meadow #1',
             1: 'Pasture #1',
             2: 'Taiga / Tundra'
-        }
+        },
+        X: 48,
+        Y: 96,
+        WIDTH: 37,
+        HEIGHT: 31
     },
     9: {
         FLAG: TEXTURE.SUPPORT_S2 | TEXTURE.SUPPORT_RTTR | TEXTURE.ARABLE | TEXTURE.HABITABLE | TEXTURE.MEADOW,
@@ -182,7 +218,11 @@ var TEXTURE_INFO = {
             0: 'Meadow #2',
             1: 'Pasture #2',
             2: 'Tundra #1'
-        }
+        },
+        X: 96,
+        Y: 96,
+        WIDTH: 37,
+        HEIGHT: 31
     },
     10: {
         FLAG: TEXTURE.SUPPORT_S2 | TEXTURE.SUPPORT_RTTR | TEXTURE.ARABLE | TEXTURE.HABITABLE | TEXTURE.MEADOW,
@@ -190,7 +230,11 @@ var TEXTURE_INFO = {
             0: 'Meadow #3',
             1: 'Pasture #3',
             2: 'Tundra #2'
-        }
+        },
+        X: 144,
+        Y: 96,
+        WIDTH: 37,
+        HEIGHT: 31
     },
     11: {
         FLAG: TEXTURE.SUPPORT_S2 | TEXTURE.SUPPORT_RTTR | TEXTURE.ROCK,
@@ -198,7 +242,11 @@ var TEXTURE_INFO = {
             0: 'Mountain #2',
             1: 'Mountain #2',
             2: 'Mountain #2'
-        }
+        },
+        X: 48,
+        Y: 48,
+        WIDTH: 37,
+        HEIGHT: 31
     },
     12: {
         FLAG: TEXTURE.SUPPORT_S2 | TEXTURE.SUPPORT_RTTR | TEXTURE.ROCK,
@@ -206,7 +254,11 @@ var TEXTURE_INFO = {
             0: 'Mountain #3',
             1: 'Mountain #3',
             2: 'Mountain #3'
-        }
+        },
+        X: 96,
+        Y: 48,
+        WIDTH: 37,
+        HEIGHT: 31
     },
     13: {
         FLAG: TEXTURE.SUPPORT_S2 | TEXTURE.SUPPORT_RTTR | TEXTURE.ROCK,
@@ -214,7 +266,11 @@ var TEXTURE_INFO = {
             0: 'Mountain #4',
             1: 'Mountain #4',
             2: 'Mountain #4'
-        }
+        },
+        X: 144,
+        Y: 48,
+        WIDTH: 37,
+        HEIGHT: 31
     },
     14: {
         FLAG: TEXTURE.SUPPORT_S2 | TEXTURE.SUPPORT_RTTR | TEXTURE.ARABLE | TEXTURE.HABITABLE | TEXTURE.STEPPE,
@@ -222,7 +278,11 @@ var TEXTURE_INFO = {
             0: 'Steppe',
             1: 'Light Steppe',
             2: 'Tundra #3'
-        }
+        },
+        X: 0,
+        Y: 144,
+        WIDTH: 37,
+        HEIGHT: 31
     },
     15: {
         FLAG: TEXTURE.SUPPORT_S2 | TEXTURE.SUPPORT_RTTR | TEXTURE.ARABLE | TEXTURE.HABITABLE | TEXTURE.MEADOW,
@@ -230,7 +290,11 @@ var TEXTURE_INFO = {
             0: 'Flower Meadow',
             1: 'Flower Pasture',
             2: 'Tundra #4'
-        }
+        },
+        X: 144,
+        Y: 0,
+        WIDTH: 37,
+        HEIGHT: 31
     },
     16: {
         FLAG: TEXTURE.SUPPORT_S2 | TEXTURE.SUPPORT_RTTR | TEXTURE.EXTREME,
@@ -238,7 +302,11 @@ var TEXTURE_INFO = {
             0: 'Lava',
             1: 'Lava',
             2: 'Lava'
-        }
+        },
+        X: 201,
+        Y: 116,
+        WIDTH: 37,
+        HEIGHT: 31
     },
     17: {
         FLAG: TEXTURE.SUPPORT_S2 | TEXTURE.ARID,
@@ -246,7 +314,11 @@ var TEXTURE_INFO = {
             0: 'Solid Color (Magenta)',
             1: 'Solid Color (Dark Red)',
             2: 'Solid Color (Black)'
-        }
+        },
+        X: 0,
+        Y: 254,
+        WIDTH: 1,
+        HEIGHT: 1
     },
     18: {
         FLAG: TEXTURE.SUPPORT_S2 | TEXTURE.SUPPORT_RTTR | TEXTURE.HABITABLE | TEXTURE.MOUNT_MEADOW,
@@ -254,7 +326,11 @@ var TEXTURE_INFO = {
             0: 'Mountain Meadow',
             1: 'Alpine Pasture',
             2: 'Snow'
-        }
+        },
+        X: 48,
+        Y: 144,
+        WIDTH: 37,
+        HEIGHT: 31
     },
     19: {
         FLAG: TEXTURE.SUPPORT_S2 | TEXTURE.EXTREME,
@@ -262,7 +338,11 @@ var TEXTURE_INFO = {
             0: 'Border Water',
             1: 'Border Moor',
             2: 'Border Water'
-        }
+        },
+        X: 201,
+        Y: 59,
+        WIDTH: 37,
+        HEIGHT: 31
     },
     20: {
         FLAG: TEXTURE.SUPPORT_S2 | TEXTURE.EXTREME,
@@ -270,7 +350,11 @@ var TEXTURE_INFO = {
             0: 'Solid Color Lava #1 (Magenta)',
             1: 'Solid Color Lava #1 (Dark Red)',
             2: 'Solid Color Lava #1 (Black)'
-        }
+        },
+        X: 64,
+        Y: 221,
+        WIDTH: 34,
+        HEIGHT: 34
     },
     21: {
         FLAG: TEXTURE.SUPPORT_S2 | TEXTURE.EXTREME,
@@ -278,7 +362,11 @@ var TEXTURE_INFO = {
             0: 'Solid Color Lava #2 (Magenta)',
             1: 'Solid Color Lava #2 (Dark Red)',
             2: 'Solid Color Lava #2 (Black)'
-        }
+        },
+        X: 98,
+        Y: 221,
+        WIDTH: 34,
+        HEIGHT: 34
     },
     22: {
         FLAG: TEXTURE.SUPPORT_S2 | TEXTURE.EXTREME,
@@ -286,7 +374,11 @@ var TEXTURE_INFO = {
             0: 'Solid Color Lava #3 (Magenta)',
             1: 'Solid Color Lava #3 (Dark Red)',
             2: 'Solid Color Lava #3 (Black)'
-        }
+        },
+        X: 132,
+        Y: 221,
+        WIDTH: 34,
+        HEIGHT: 34
     },
     34: {
         FLAG: TEXTURE.SUPPORT_S2 | TEXTURE.HABITABLE | TEXTURE.MOUNT_MEADOW,
@@ -294,7 +386,11 @@ var TEXTURE_INFO = {
             0: 'Mountain #2 (Habitable)',
             1: 'Mountain #2 (Habitable)',
             2: 'Mountain #2 (Habitable)'
-        }
+        },
+        X: 48,
+        Y: 48,
+        WIDTH: 37,
+        HEIGHT: 31
     }
 }
 

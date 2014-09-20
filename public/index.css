@@ -436,3 +436,70 @@ button {
     position: absolute;
     top: 100%;
 }
+
+.texture-option-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.texture-option {
+    background-color: white;
+    border: 1px solid rgba(255, 219, 23, 0);
+    display: inline-block;
+    height: 31px;
+    margin: 0 37px 31px 0;
+    overflow: hidden;
+    position: relative;
+    vertical-align: top;
+    -webkit-transform: scale(2);
+    transform: scale(2);
+    -webkit-transform-origin: 0 0;
+    transform-origin: 0 0;
+    -webkit-transition: border-color 0.25s ease-in-out;
+    transition: border-color 0.25s ease-in-out;
+    width: 37px;
+}
+
+.texture-option:hover {
+    opacity: 0.75;
+}
+
+.texture-option--selected {
+    border: 2px solid #DB7F2B; /*#C32323;*/
+    margin-left: -2px;
+    margin-right: 37px;
+    margin-top: -2px;
+    z-index: 1;
+}
+
+.texture-option__label {
+    background: url('./texture_0-greenland.png') no-repeat 0 0;
+    display: block;
+    position: relative;
+}
+
+.texture-option--terrain1 .texture-option__label {
+    background-image: url('./texture_1-wasteland.png');
+}
+
+.texture-option--terrain2 .texture-option__label {
+    background-image: url('./texture_2-winter-world.png');
+}
+
+.texture-option__name,
+.texture-option__input {
+    clip: rect(0 0 0 0);
+    height: 0;
+    opacity: 0;
+    position: absolute;
+    width: 0;
+    z-index: -1;
+}
+
+.texture-option__name {
+    -webkit-pointer-events: none;
+    -moz-pointer-events: none;
+    -ms-pointer-events: none;
+    pointer-events: none;
+}
