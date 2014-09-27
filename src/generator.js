@@ -202,7 +202,7 @@ var Generator = function() {
 
         if(options.groundLevel > 5) options.groundLevel = 5;
         if(options.flatten < 1) options.flatten = 1;
-        else if(options.flatten > 30) options.flatten = 30;
+        else if(options.flatten > 100) options.flatten = 100;
 
         map.initializeHeight(options.baseLevel);
 
@@ -257,18 +257,10 @@ var Generator = function() {
                         // GIGANTIC MOUNTAINS
                         //map.changeHeight(x, y, (value - i) / 24, (value - i) > 0 ? (value & i & 81) + 1 : -((value & i & 5) - 1) / 2);
                         // OUT OF THIS WORLD MOUNTAINS
-                        map.changeHeight(x, y, Math.min((value - i) / 24, 1), (value - i) > 0 ? (value & i & 81) + 1 : -(value & i & 3) - 1);
+                        map.changeHeight(x, y, Math.min((value - i) / options.flatten, 1), (value - i) > 0 ? (value & i & 81) + 1 : -(value & i & 3) - 1);
                     }
                 }
                 index++;
-            }
-        }
-
-        // flatten
-        if(options.flatten > 1) {
-            baseLevel = ~~(baseLevel / options.flatten);
-            for(i = 0; i < size; i++) {
-                data[i] = ~~(data[i] / options.flatten);
             }
         }
 
@@ -339,10 +331,10 @@ var Generator = function() {
                     // Flower variant
                     map.setTexture(i, 0x0F);
                 }
-            } else if(/*j === 0 &&*/ smallestHeight > data[i] - 2) {
-                // Swamp
-                map.setTexture(i, 0x03);
-            }
+            }// else if(/*j === 0 &&*/ smallestHeight > data[i] - 2) {
+            //    // Swamp
+            //    map.setTexture(i, 0x03);
+            //}
         }
 
         map.initializeObjects();

@@ -27,7 +27,7 @@ var App = React.createClass({
             viewType: 11,
             heightOptions: {
                 baseLevel: 5,
-                flatten: 1,
+                flatten: 25,
                 groundLevel: 3,
                 randomize: 0.3,
                 noiseOnWater: false
@@ -237,7 +237,7 @@ var App = React.createClass({
     },
 
     handleFlatten: function(value) {
-        value = (~~value) / 10;
+        value = ~~value;
         if(this.state.heightOptions.flatten !== value) {
             this.state.heightOptions.flatten = value;
             this.handleLandscape();
@@ -462,8 +462,8 @@ var App = React.createClass({
                     </dd>
                     <dt>Flatten:</dt>
                     <dd>
-                        <IncDec minimumValue="10" maximumValue="300"
-                        value={''+~~(this.state.heightOptions.flatten * 10)} onChange={this.handleFlatten} />
+                        <IncDec minimumValue="1" maximumValue="40"
+                        value={''+this.state.heightOptions.flatten} onChange={this.handleFlatten} />
                     </dd>
                     <dt>Noise:</dt>
                     <dd>

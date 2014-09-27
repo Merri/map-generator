@@ -462,6 +462,8 @@ button {
 
 .texture-option:hover {
     opacity: 0.75;
+    -webkit-filter: brightness(92%) contrast(200%);
+    filter: brightness(92%) contrast(200%);
 }
 
 .texture-option--selected {
