@@ -41,12 +41,10 @@ module.exports = React.createClass({
                 var selected = this.state.texture === texture,
                     className = 'texture-option texture-option--terrain' + this.props.terrain,
                     textureInfo = TEXTURE_INFO[texture],
-                    ratio = 37 / textureInfo.WIDTH,
+                    ratio = Math.max(50 / textureInfo.WIDTH, 50 / textureInfo.HEIGHT),
                     style = {
                         backgroundPosition: ~~(-textureInfo.X * ratio) + 'px ' + ~~(-textureInfo.Y * ratio) + 'px',
-                        backgroundSize: ~~(256 * ratio) + 'px ' + ~~(256 * ratio) + 'px',
-                        height: '31px',
-                        width: '37px'
+                        backgroundSize: ~~(256 * ratio) + 'px ' + ~~(256 * ratio) + 'px'
                     },
                     name = textureInfo.NAME[this.props.terrain];
 

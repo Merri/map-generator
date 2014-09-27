@@ -608,7 +608,7 @@ var Generator = function() {
                 }
             } else if(map.isEachTextureSame(i, 0x03)) {
                 if(Math.random() < 0.05) {
-                    map.setTexture(i, 0x05);
+                    map.setTexture(i, 0x13);
                 }
             }
         }

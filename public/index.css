@@ -446,19 +446,18 @@ button {
 .texture-option {
     background-color: white;
     border: 1px solid rgba(255, 219, 23, 0);
+    border-radius: 50%;
     display: inline-block;
-    height: 31px;
-    margin: 0 37px 31px 0;
+    height: 50px;
+    margin: 0;
     overflow: hidden;
     position: relative;
     vertical-align: top;
-    -webkit-transform: scale(2);
-    transform: scale(2);
-    -webkit-transform-origin: 0 0;
-    transform-origin: 0 0;
+    -webkit-transform: scale(1.01);
+    transform: scale(1.01);
     -webkit-transition: border-color 0.25s ease-in-out;
     transition: border-color 0.25s ease-in-out;
-    width: 37px;
+    width: 50px;
 }
 
 .texture-option:hover {
@@ -466,17 +465,18 @@ button {
 }
 
 .texture-option--selected {
-    border: 2px solid #DB7F2B; /*#C32323;*/
-    margin-left: -2px;
-    margin-right: 37px;
-    margin-top: -2px;
+    border: 4px solid #DB7F2B; /*#C32323;*/
+    box-shadow: 0 0 1px 1px black;
+    margin: -3px;
     z-index: 1;
 }
 
 .texture-option__label {
     background: url('./texture_0-greenland.png') no-repeat 0 0;
     display: block;
+    height: 50px;
     position: relative;
+    width: 50px;
 }
 
 .texture-option--terrain1 .texture-option__label {
