@@ -7,7 +7,8 @@ var React = require('react'),
     Generator = require('./generator'),
     Compatibility = require('./components/compatibility.jsx'),
     IncDec = require('./components/inc-dec.jsx'),
-    TextureOption = require('./components/texture-option.jsx');
+    TextureOption = require('./components/texture-option.jsx'),
+    Unsupported = require('./components/unsupported.jsx');
 
 var generator = new Generator();
 
@@ -19,6 +20,7 @@ var App = React.createClass({
     getInitialState: function() {
         return {
             hasLocalStorage: false,
+            meetsRequirements: !!window.ArrayBuffer && !!window.Uint8Array && !!window.Uint32Array,
             compatibility: 'return-to-the-roots',
             maxPlayers: 7,
             playerMinDistance: 50,
@@ -63,32 +65,35 @@ var App = React.createClass({
 
     componentWillMount: function() {
         var hasLocalStorage = false;
-        // if localStorage / cookies are disabled then accessing localStorage will throw an error
-        try {
-            hasLocalStorage = !!localStorage;
-        } catch(err) {}
 
-        if(hasLocalStorage) {
-            if(localStorage.width)
-                this.state.seedOptions.width = ~~localStorage.width;
-            if(localStorage.height)
-                this.state.seedOptions.height = ~~localStorage.height;
-        }
+        if(this.state.meetsRequirements) {
+            // if localStorage / cookies are disabled then accessing localStorage will throw an error
+            try {
+                hasLocalStorage = !!localStorage;
+            } catch(err) {}
 
-        this.setState({
-            hasLocalStorage: hasLocalStorage,
-            // make initial render of the page to have canvas elements in the right size
-            width: this.state.seedOptions.width,
-            height: this.state.seedOptions.height
-        });
+            if(hasLocalStorage) {
+                if(localStorage.width)
+                    this.state.seedOptions.width = ~~localStorage.width;
+                if(localStorage.height)
+                    this.state.seedOptions.height = ~~localStorage.height;
+            }
 
-        generator.setColorMap('alternative').then(function() {
             this.setState({
-                viewType: 'pretty'
+                hasLocalStorage: hasLocalStorage,
+                // make initial render of the page to have canvas elements in the right size
+                width: this.state.seedOptions.width,
+                height: this.state.seedOptions.height
             });
 
-            this.handleSeed();
-        }.bind(this), this.handleSeed);
+            generator.setColorMap('alternative').then(function() {
+                this.setState({
+                    viewType: 'pretty'
+                });
+
+                this.handleSeed();
+            }.bind(this), this.handleSeed);
+        }
     },
 
     generateHeightMap: function() {
@@ -315,6 +320,10 @@ var App = React.createClass({
     },
 
     render: function() {
+        if(!this.state.meetsRequirements) {
+            return <Unsupported />;
+        }
+
         var gold = this.state.resources.mineGold || 0,
             coal = this.state.resources.mineCoal || 0,
             ironOre = this.state.resources.mineIronOre || 0,
