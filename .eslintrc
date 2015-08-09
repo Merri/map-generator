@@ -1,5 +1,6 @@
 {
     "extends": "vaffel/react",
+    "parser": "babel-eslint",
     "rules": {
         "no-bitwise": 0,
         "no-eq-null": 0,
