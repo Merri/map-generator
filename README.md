@@ -1,20 +1,20 @@
-The Settlers II.net Map Generator
-=================================
+**NOTE!** This project is being refactored for better code reuse.
 
-Generates random maps for [The Settlers II](http://settlers2.net/) and [Return to the Roots](http://www.rttr.info/).
+# Map Generator
 
-This project is running at http://settlers2.net/map-generator/
+JavaScript utilities for working with 2D game maps and terrains for the purpose of generating cool looking fields to
+play with.
 
 See the [TODO list](https://github.com/Merri/map-generator/wiki) @ wiki.
 
+### Notes
 
-Setting up development environment
-----------------------------------
+This project started as The Settlers II.net Map Generator, but is going to be abstracted better over time so that the
+map generator part becomes independent module that is usable for other games and projects as well.
 
-Just clone to your preferred git project location. You need Node and a local webserver to serve the `public/index.html` file (you can also just open the file in browser, but accessing images has cross-origin protection so map render features are more limited).
+The current state of this project is running at http://settlers2.net/map-generator/
 
-To get started with development itself:
+You can read more about [The Settlers II](http://settlers2.net/) or [Return to the Roots](http://www.rttr.info/) on
+their respective sites.
 
-	npm install
-
-After running this you should have the dev environment running and be able to run continuous preprocessing by typing `npm start`. JavaScript is processed on the fly into `public/bundle.js`. Once you're done you should do `npm run build` to compile the production version.
+S2.net Map Generator will become it's own project once abstraction is good enough.
