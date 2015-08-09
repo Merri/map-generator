@@ -1,29 +1,51 @@
 {
-  "author": "Vesa Piittinen <vesa.piittinen@gmail.com> (http://settlers2.net/)",
   "name": "map-generator",
-  "description": "Generates maps for The Settlers II, Return to the Roots and The Settlers II Anniversary Edition",
-  "version": "0.3.0",
+  "version": "0.1.0",
+  "description": "Utilities for generating 2D terrain (game maps / worlds) with height differences (2.5D, faux/pseudo 3D)",
+  "main": "./src/generator.js",
   "scripts": {
-    "build": "rm ./public/bundle.js* && browserify -e ./src/controller.jsx -t reactify -d -p [minifyify --map bundle.map.json --output ./public/bundle.map.json] -o ./public/bundle.js && gzip -vfc9 ./public/bundle.js >> ./public/bundle.js.gz",
-    "start": "watchify -e ./src/controller.jsx -t reactify -d -p [minifyify --map bundle.map.json --output ./public/bundle.map.json] -o ./public/bundle.js -v",
-    "uglify": "browserify -e ./src/controller.jsx -t reactify -g uglifyify -o ./public/bundle.js"
+    "old_build": "rm ./public/bundle.js* && browserify -e ./src/controller.jsx -t reactify -d -p [minifyify --map bundle.map.json --output ./public/bundle.map.json] -o ./public/bundle.js && gzip -vfc9 ./public/bundle.js >> ./public/bundle.js.gz",
+    "old_start": "watchify -e ./src/controller.jsx -t reactify -d -p [minifyify --map bundle.map.json --output ./public/bundle.map.json] -o ./public/bundle.js -v",
+    "old_uglify": "browserify -e ./src/controller.jsx -t reactify -g uglifyify -o ./public/bundle.js",
+
+    "pretest": "npm run lint",
+    "lint": "eslint .",
+    "prepublish": "npm prune && npm test",
+    "build": "NODE_ENV=production webpack",
+    "build_windows": "set NODE_ENV=production&&webpack",
+    "watch": "webpack --watch",
+    "test": "mocha --reporter spec"
   },
   "repository": {
     "type": "git",
     "url": "git://github.com/Merri/map-generator.git"
   },
-  "main": "./src/generator.js",
+  "author": "Vesa Piittinen <vesa.piittinen@gmail.com> (http://settlers2.net/)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/merri/map-generator/issues"
+  },
+  "homepage": "https://github.com/merri/react-tabbordion/issues",
   "devDependencies": {
+    "babel-core": "^5.4.3",
+    "babel-loader": "^5.1.2",
+    "chai": "^2.3.0",
+    "eslint": "0.21.2",
+    "eslint-config-vaffel": "1.0.0",
+    "eslint-plugin-react": "2.3.0",
+    "jsdom": "3.1.2",
+    "mocha": "^2.2.5",
+    "mocha-jsdom": "^0.3.0",
+    "node-libs-browser": "^0.5.0",
+    "react": "~0.13.0",
+    "webpack": "^1.9.7",
+
+    "promise": "^6.0.0",
+
     "browserify": "^5.11.2",
     "minifyify": "^4.1.2",
-    "promise": "^6.0.0",
-    "react": "^0.11.1",
     "reactify": "^0.14.0",
     "uglifyify": "^2.5.0",
     "watchify": "^1.0.2"
-  },
-  "engines": {
-    "node": "0.10.x"
-  },
-  "license": "MIT"
+  }
 }
