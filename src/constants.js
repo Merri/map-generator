@@ -1,13 +1,13 @@
 'use strict';
 
-var AREA = {
+const AREA = {
     UNUSED: 0,
     LAND: 1,
     WATER: 2,
     IMPASSABLE: 254
-};
+}
 
-var COLOR = {
+const COLOR = {
     ORIGINAL: [
         [233, 216, 123, 233, 199, 240, 240, 199, 231, 233, 230, 216, 216, 215, 236, 231, 57, 254, 216, 240, 57, 57, 57, 0xFF, 0xFF, 0xFF, 0xFF,
         0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 216, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
@@ -30,9 +30,9 @@ var COLOR = {
         0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 120, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
         0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF]
     ]
-};
+}
 
-var CP437 = [0, 9786, 9787, 9829, 9830, 9827, 9824, 8226, 9688, 9675, 9689, 9794, 9792, 9834, 9835, 9788, 9658, 9668, 8597, 8252, 182, 167,
+const CP437 = [0, 9786, 9787, 9829, 9830, 9827, 9824, 8226, 9688, 9675, 9689, 9794, 9792, 9834, 9835, 9788, 9658, 9668, 8597, 8252, 182, 167,
     9644, 8616, 8593, 8595, 8594, 8592, 8735, 8596, 9650, 9660, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51,
     52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86,
     87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117,
@@ -41,15 +41,15 @@ var CP437 = [0, 9786, 9787, 9829, 9830, 9827, 9824, 8226, 9688, 9675, 9689, 9794
     171, 187, 9617, 9618, 9619, 9474, 9508, 9569, 9570, 9558, 9557, 9571, 9553, 9559, 9565, 9564, 9563, 9488, 9492, 9524, 9516, 9500, 37, 37,
     9566, 567, 9562, 9556, 9577, 9574, 9568, 9552, 9580, 9575, 9576, 9572, 9573, 9561, 9560, 9554, 9555, 9579, 9578, 9496, 9484, 9608, 9604,
     9612, 9616, 9600, 945, 223, 915, 960, 931, 963, 181, 964, 934, 920, 937, 948, 8734, 966, 949, 8745, 8801, 177, 8805, 8804, 8992, 8993, 247,
-    8776, 176, 8729, 183, 8730, 8319, 178, 9632, 160];
+    8776, 176, 8729, 183, 8730, 8319, 178, 9632, 160]
 
-var OBJECT_TYPE = {
+const OBJECT_TYPE = {
     TREE: 0xC4,
     GRANITE: 0xCC,
     MATCH: 0xFC
-};
+}
 
-var RESOURCE = {
+const RESOURCE = {
     FRESH_WATER: 0x21,
     // 0x40 - 0x47
     COAL: 0x40,
@@ -60,9 +60,9 @@ var RESOURCE = {
     // 0x58 - 0x5F
     GRANITE: 0x58,
     FISH: 0x87
-};
+}
 
-var SITE = {
+const SITE = {
     FLAG: 0x01,
     HUT: 0x02,
     HOUSE: 0x03,
@@ -75,15 +75,15 @@ var SITE = {
     MINE_OCCUPIED: 0x0D,
     TREE: 0x68,
     IMPASSABLE: 0x78
-};
+}
 
-var TERRAIN = {
+const TERRAIN = {
     GREENLAND: 0,
     WASTELAND: 1,
     WINTERWORLD: 2
-};
+}
 
-var TEXTURE = {
+const TEXTURE = {
     // texture is usable in The Settlers II
     SUPPORT_S2: 0x01,
     // texture is usable in Return to the Roots
@@ -119,9 +119,9 @@ var TEXTURE = {
     UNKNOWN: 0x80,
     // to get rid of support flags
     DROP_SUPPORT: 0xFC
-};
+}
 
-var TEXTURE_INFO = {
+const TEXTURE_INFO = {
     0: {
         FLAG: TEXTURE.SUPPORT_S2 | TEXTURE.SUPPORT_RTTR | TEXTURE.ARABLE | TEXTURE.HABITABLE | TEXTURE.SAVANNAH,
         NAME: {
@@ -412,7 +412,7 @@ var TEXTURE_INFO = {
     }
 }
 
-var TREE_INFO = [
+const TREE_INFO = [
     [
         {
             RED: 21,
@@ -753,7 +753,7 @@ var TREE_INFO = [
             NAME: 'Unused #7'
         }
     ]
-];
+]
 
 module.exports = {
     AREA: AREA,
