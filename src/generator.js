@@ -119,7 +119,8 @@ var Generator = function() {
                 startingPoints++;
             }
         }
-        /*x = ~~(Math.random() * (width - borderProtection * 2)) + borderProtection;
+        /*
+        x = ~~(Math.random() * (width - borderProtection * 2)) + borderProtection;
         y = ~~(Math.random() * (height - borderProtection * 2)) + borderProtection;
         index = y * width + x;
         var direction = ~~(Math.random() * 6),
@@ -159,7 +160,8 @@ var Generator = function() {
                     startingPoints++;
                 }
             }
-        }*/
+        }
+        */
 
         var expander = 7;
 
@@ -248,14 +250,16 @@ var Generator = function() {
                             break;
                         }
                     }
-                    /*around = map.getNodesByIndex(index);
+                    /*
+                    around = map.getNodesByIndex(index);
                     i1 = seedMap[around.left];
                     i2 = seedMap[around.right];
                     i3 = seedMap[around.topLeft];
                     i4 = seedMap[around.topRight];
                     i5 = seedMap[around.bottomLeft];
                     i6 = seedMap[around.bottomRight];
-                    i7 = (i1 > 1) + (i2 > 1) + (i3 > 1) + (i4 > 1) + (i5 > 1) + (i6 > 1);*/
+                    i7 = (i1 > 1) + (i2 > 1) + (i3 > 1) + (i4 > 1) + (i5 > 1) + (i6 > 1);
+                    */
                     if (i > around.length - 6) {
                         // calculate avarage around node
                         // i = Math.round((i1 + i2 + i3 + i4 + i5 + i6) / i7);
@@ -272,7 +276,12 @@ var Generator = function() {
                         // GIGANTIC MOUNTAINS
                         // map.changeHeight(x, y, (value - i) / 24, (value - i) > 0 ? (value & i & 81) + 1 : -((value & i & 5) - 1) / 2);
                         // OUT OF THIS WORLD MOUNTAINS
-                        map.changeHeight(x, y, Math.min((value - i) / options.flatten, 1), (value - i) > 0 ? (value & i & 81) + 1 : -(value & i & 3) - 1);
+                        map.changeHeight(
+                            x,
+                            y,
+                            Math.min((value - i) / options.flatten, 1),
+                            (value - i) > 0 ? (value & i & 81) + 1 : -(value & i & 3) - 1
+                        );
                     }
                 }
                 index++;
@@ -414,53 +423,6 @@ var Generator = function() {
         if (!options.seamless) {
             for (i = 0; i < width; i++) {
                 switch (data[textureBlock1 + i]) {
-                // savannah and steppe
-                case 0x00:
-                case 0x0E:
-                    // swamp
-                    map.setTexture(i, 0x03);
-                    break;
-                // meadow
-                case 0x08:
-                case 0x09:
-                case 0x0A:
-                case 0x0F:
-                    // swamp
-                    map.setTexture(i, 0x03);
-                    break;
-                // desert
-                case 0x04:
-                case 0x07:
-                    // snow
-                    map.setTexture(i, 0x02);
-                    break;
-                // magenta
-                case 0x11:
-                    // lava
-                    map.setTexture(i, 0x10);
-                    break;
-                // mountain meadow
-                case 0x12:
-                case 0x22:
-                    // lava
-                    map.setTexture(i, 0x10);
-                    break;
-                // mountain
-                case 0x01:
-                case 0x0B:
-                case 0x0C:
-                case 0x0D:
-                    // snow
-                    map.setTexture(i, 0x02);
-                    break;
-                // water
-                case 0x05:
-                case 0x06:
-                    // water (no ships)
-                    map.setTexture(i, 0x13);
-                    break;
-                default:
-                    switch (data[textureBlock2 + i]) {
                     // savannah and steppe
                     case 0x00:
                     case 0x0E:
@@ -507,58 +469,58 @@ var Generator = function() {
                         map.setTexture(i, 0x13);
                         break;
                     default:
-                    }
+                        switch (data[textureBlock2 + i]) {
+                            // savannah and steppe
+                            case 0x00:
+                            case 0x0E:
+                                // swamp
+                                map.setTexture(i, 0x03);
+                                break;
+                            // meadow
+                            case 0x08:
+                            case 0x09:
+                            case 0x0A:
+                            case 0x0F:
+                                // swamp
+                                map.setTexture(i, 0x03);
+                                break;
+                            // desert
+                            case 0x04:
+                            case 0x07:
+                                // snow
+                                map.setTexture(i, 0x02);
+                                break;
+                            // magenta
+                            case 0x11:
+                                // lava
+                                map.setTexture(i, 0x10);
+                                break;
+                            // mountain meadow
+                            case 0x12:
+                            case 0x22:
+                                // lava
+                                map.setTexture(i, 0x10);
+                                break;
+                            // mountain
+                            case 0x01:
+                            case 0x0B:
+                            case 0x0C:
+                            case 0x0D:
+                                // snow
+                                map.setTexture(i, 0x02);
+                                break;
+                            // water
+                            case 0x05:
+                            case 0x06:
+                                // water (no ships)
+                                map.setTexture(i, 0x13);
+                                break;
+                            default:
+                        }
                 }
             }
             for (; i < size; i += width) {
                 switch (data[textureBlock1 + i]) {
-                // savannah and steppe
-                case 0x00:
-                case 0x0E:
-                    // swamp
-                    map.setTexture(i, 0x03);
-                    break;
-                // meadow
-                case 0x08:
-                case 0x09:
-                case 0x0A:
-                case 0x0F:
-                    // swamp
-                    map.setTexture(i, 0x03);
-                    break;
-                // desert
-                case 0x04:
-                case 0x07:
-                    // snow
-                    map.setTexture(i, 0x02);
-                    break;
-                // magenta
-                case 0x11:
-                    // lava
-                    map.setTexture(i, 0x10);
-                    break;
-                // mountain meadow
-                case 0x12:
-                case 0x22:
-                    // lava
-                    map.setTexture(i, 0x10);
-                    break;
-                // mountain
-                case 0x01:
-                case 0x0B:
-                case 0x0C:
-                case 0x0D:
-                    // snow
-                    map.setTexture(i, 0x02);
-                    break;
-                // water
-                case 0x05:
-                case 0x06:
-                    // water (no ships)
-                    map.setTexture(i, 0x13);
-                    break;
-                default:
-                    switch (data[textureBlock2 + i]) {
                     // savannah and steppe
                     case 0x00:
                     case 0x0E:
@@ -605,7 +567,54 @@ var Generator = function() {
                         map.setTexture(i, 0x13);
                         break;
                     default:
-                    }
+                        switch (data[textureBlock2 + i]) {
+                            // savannah and steppe
+                            case 0x00:
+                            case 0x0E:
+                                // swamp
+                                map.setTexture(i, 0x03);
+                                break;
+                            // meadow
+                            case 0x08:
+                            case 0x09:
+                            case 0x0A:
+                            case 0x0F:
+                                // swamp
+                                map.setTexture(i, 0x03);
+                                break;
+                            // desert
+                            case 0x04:
+                            case 0x07:
+                                // snow
+                                map.setTexture(i, 0x02);
+                                break;
+                            // magenta
+                            case 0x11:
+                                // lava
+                                map.setTexture(i, 0x10);
+                                break;
+                            // mountain meadow
+                            case 0x12:
+                            case 0x22:
+                                // lava
+                                map.setTexture(i, 0x10);
+                                break;
+                            // mountain
+                            case 0x01:
+                            case 0x0B:
+                            case 0x0C:
+                            case 0x0D:
+                                // snow
+                                map.setTexture(i, 0x02);
+                                break;
+                            // water
+                            case 0x05:
+                            case 0x06:
+                                // water (no ships)
+                                map.setTexture(i, 0x13);
+                                break;
+                            default:
+                        }
                 }
             }
         }
@@ -653,10 +662,12 @@ var Generator = function() {
             }
         }
 
-        /*var radiusNodes = map.getRadiusNodes(0, 1, 2, true);
+        /*
+        var radiusNodes = map.getRadiusNodes(0, 1, 2, true);
         for (i = 0; i < 12; i++) {
             map.setTexture(radiusNodes[i], 0x10);
-        }*/
+        }
+        */
 
         map.calculateSiteMap();
         areas = map.calculateAreaMap();
@@ -934,241 +945,241 @@ var Generator = function() {
         var i, j, k
 
         switch (viewType) {
-        case 0:
-        case 1:
-        case 2:
-        case 3:
-        case 4:
-        case 5:
-        case 6:
-        case 7:
-        case 8:
-        case 9:
-        case 10:
-        case 11:
-        case 12:
-        case 13:
-        case 14:
-            for (i = size * viewType, j = 0, k = i + size; i < k; i++) {
-                view[j++] = data[i];
-                view[j++] = data[i];
-                view[j++] = data[i];
-                view[j++] = 255;
-            }
-            break;
-        case 'seed':
-            for (i = 0, j = 0; i < size; i++) {
-                view[j++] = 255 - seedMap[i];
-                view[j++] = 255 - seedMap[i];
-                view[j++] = 255 - seedMap[i];
-                view[j++] = 255;
-            }
+            case 0:
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+            case 5:
+            case 6:
+            case 7:
+            case 8:
+            case 9:
+            case 10:
+            case 11:
+            case 12:
+            case 13:
+            case 14:
+                for (i = size * viewType, j = 0, k = i + size; i < k; i++) {
+                    view[j++] = data[i];
+                    view[j++] = data[i];
+                    view[j++] = data[i];
+                    view[j++] = 255;
+                }
+                break;
+            case 'seed':
+                for (i = 0, j = 0; i < size; i++) {
+                    view[j++] = 255 - seedMap[i];
+                    view[j++] = 255 - seedMap[i];
+                    view[j++] = 255 - seedMap[i];
+                    view[j++] = 255;
+                }
 
-            nodes.forEach(function(nodeIndex) {
-                view[(nodeIndex << 2)] = 96;
-                view[(nodeIndex << 2) + 1] = 176;
-                view[(nodeIndex << 2) + 2] = 255;
-            });
-            break;
-        case 'fast':
-            (function() {
-                var color = colors[options.terrain].data,
-                    // row information so we can do some graphical adjustments
-                    y = -1,
-                    textureColorOriginal = COLOR.ORIGINAL[options.terrain],
-                    treeIndex, g, c1,
-                    color1, color2, color3,
-                    texturesBlock = size,
-                    objectIndexBlock = size * 4,
-                    objectTypeBlock = size * 5,
-                    drawPos = 0;
+                nodes.forEach(function(nodeIndex) {
+                    view[(nodeIndex << 2)] = 96;
+                    view[(nodeIndex << 2) + 1] = 176;
+                    view[(nodeIndex << 2) + 2] = 255;
+                });
+                break;
+            case 'fast':
+                (function() {
+                    var color = colors[options.terrain].data,
+                        // row information so we can do some graphical adjustments
+                        y = -1,
+                        textureColorOriginal = COLOR.ORIGINAL[options.terrain],
+                        treeIndex, g, c1,
+                        color1, color2, color3,
+                        texturesBlock = size,
+                        objectIndexBlock = size * 4,
+                        objectTypeBlock = size * 5,
+                        drawPos = 0;
 
-                // and then we just loop through!
-                for (i = 0; i < size; i++) {
-                    // keep track of current row
-                    if (i % width === 0) {
-                        y++;
-                    }
-                    // mark as nothing drawn yet
-                    color1 = null;
-                    // not done yet! check for objects!
-                    switch (data[objectTypeBlock + i]) {
-                    // trees
-                    case 196:
-                    case 197:
-                    case 198:
-                    case 199:
-                        treeIndex = ((data[objectTypeBlock + i] & 2) << 2) | ((data[objectIndexBlock + i] & 0xC0) >> 6);
-                        // these colors are from screenshot of Map Editor / S2EDIT.EXE
-                        // FYI: tree indexes with color are 0, 1, 2, 6, 7, 8, 12, 13, 14, 18, 19, 20
-                        // the other half are not painted on the map
-                        switch ((treeIndex % 6) + options.terrain * 6) {
-                        // GREENLAND
-                        case 0:
-                            color1 = 0;
-                            color2 = 73;
-                            color3 = 18;
-                            break;
-                        case 1:
-                            color1 = 6;
-                            color2 = 93;
-                            color3 = 15;
-                            break;
-                        case 2:
-                            color1 = 0;
-                            color2 = 51;
-                            color3 = 19;
-                            break;
-                        // WASTELAND
-                        case 6:
-                            color1 = 69;
-                            color2 = 59;
-                            color3 = 18;
-                            break;
-                        case 7:
-                            color1 = 69;
-                            color2 = 67;
-                            color3 = 42;
-                            break;
-                        case 8:
-                            color1 = 0;
-                            color2 = 51;
-                            color3 = 19;
-                            break;
-                        // WINTER WORLD
-                        case 12:
-                            color1 = 25;
-                            color2 = 64;
-                            color3 = 0;
-                            break;
-                        case 13:
-                            color1 = 41;
-                            color2 = 86;
-                            color3 = 0;
-                            break;
-                        case 14:
-                            color1 = 14;
-                            color2 = 41;
-                            color3 = 0;
-                            break;
-                        // NOTHING DRAWN ON MAP, these trees do not have a color
-                        default:
+                    // and then we just loop through!
+                    for (i = 0; i < size; i++) {
+                        // keep track of current row
+                        if (i % width === 0) {
+                            y++;
                         }
-                        break;
-                    // granite
-                    case 204:
-                    case 205:
-                        // color1 = 134;
-                        // color2 = 122;
-                        // color3 = 103;
-                        break;
-                    default:
-                    }
+                        // mark as nothing drawn yet
+                        color1 = null;
+                        // not done yet! check for objects!
+                        switch (data[objectTypeBlock + i]) {
+                            // trees
+                            case 196:
+                            case 197:
+                            case 198:
+                            case 199:
+                                treeIndex = ((data[objectTypeBlock + i] & 2) << 2) | ((data[objectIndexBlock + i] & 0xC0) >> 6);
+                                // these colors are from screenshot of Map Editor / S2EDIT.EXE
+                                // FYI: tree indexes with color are 0, 1, 2, 6, 7, 8, 12, 13, 14, 18, 19, 20
+                                // the other half are not painted on the map
+                                switch ((treeIndex % 6) + options.terrain * 6) {
+                                    // GREENLAND
+                                    case 0:
+                                        color1 = 0;
+                                        color2 = 73;
+                                        color3 = 18;
+                                        break;
+                                    case 1:
+                                        color1 = 6;
+                                        color2 = 93;
+                                        color3 = 15;
+                                        break;
+                                    case 2:
+                                        color1 = 0;
+                                        color2 = 51;
+                                        color3 = 19;
+                                        break;
+                                    // WASTELAND
+                                    case 6:
+                                        color1 = 69;
+                                        color2 = 59;
+                                        color3 = 18;
+                                        break;
+                                    case 7:
+                                        color1 = 69;
+                                        color2 = 67;
+                                        color3 = 42;
+                                        break;
+                                    case 8:
+                                        color1 = 0;
+                                        color2 = 51;
+                                        color3 = 19;
+                                        break;
+                                    // WINTER WORLD
+                                    case 12:
+                                        color1 = 25;
+                                        color2 = 64;
+                                        color3 = 0;
+                                        break;
+                                    case 13:
+                                        color1 = 41;
+                                        color2 = 86;
+                                        color3 = 0;
+                                        break;
+                                    case 14:
+                                        color1 = 14;
+                                        color2 = 41;
+                                        color3 = 0;
+                                        break;
+                                    // NOTHING DRAWN ON MAP, these trees do not have a color
+                                    default:
+                                }
+                                break;
+                            // granite
+                            case 204:
+                            case 205:
+                                // color1 = 134;
+                                // color2 = 122;
+                                // color3 = 103;
+                                break;
+                            default:
+                        }
 
-                    if (color1 == null) {
-                        g = ~~((data[lightMapBlock + i] / 128) * 255);
-                        c1 = (g + 256 * textureColorOriginal[data[texturesBlock + i] & 0x3F]) * 4;
-                        color1 = color[c1++];
-                        color2 = color[c1++];
-                        color3 = color[c1++];
-                    }
+                        if (color1 == null) {
+                            g = ~~((data[lightMapBlock + i] / 128) * 255);
+                            c1 = (g + 256 * textureColorOriginal[data[texturesBlock + i] & 0x3F]) * 4;
+                            color1 = color[c1++];
+                            color2 = color[c1++];
+                            color3 = color[c1++];
+                        }
 
-                    view[drawPos++] = color1;
-                    view[drawPos++] = color2;
-                    view[drawPos++] = color3;
-                    view[drawPos++] = 255;
-                }
-            })()
-            break;
-        case 'pretty':
-            (function() {
-                var color = colors[options.terrain].data,
-                    // row information so we can do some graphical adjustments
-                    y = -1,
-                    textureColorMerri = COLOR.MERRI[options.terrain],
-                    textureColorOriginal = COLOR.ORIGINAL[options.terrain],
-                    treeIndex, g, g2, c1, c2, c3, c4, c5, c6, c7, c8, c9, cA, cB, cC,
-                    color1, color2, color3, colorAlpha,
-                    drawNodes,
-                    leftNodes,
-                    textures,
-                    objectIndexBlock = size * 4,
-                    objectTypeBlock = size * 5,
-                    drawPos = 0;
+                        view[drawPos++] = color1;
+                        view[drawPos++] = color2;
+                        view[drawPos++] = color3;
+                        view[drawPos++] = 255;
+                    }
+                })()
+                break;
+            case 'pretty':
+                (function() {
+                    var color = colors[options.terrain].data,
+                        // row information so we can do some graphical adjustments
+                        y = -1,
+                        textureColorMerri = COLOR.MERRI[options.terrain],
+                        textureColorOriginal = COLOR.ORIGINAL[options.terrain],
+                        treeIndex, g, g2, c1, c2, c3, c4, c5, c6, c7, c8, c9, cA, cB, cC,
+                        color1, color2, color3, colorAlpha,
+                        drawNodes,
+                        leftNodes,
+                        textures,
+                        objectIndexBlock = size * 4,
+                        objectTypeBlock = size * 5,
+                        drawPos = 0;
 
-                // and then we just loop through!
-                for (i = 0; i < size; i++) {
-                    // keep track of current row
-                    if (i % width === 0) {
-                        y++;
+                    // and then we just loop through!
+                    for (i = 0; i < size; i++) {
+                        // keep track of current row
+                        if (i % width === 0) {
+                            y++;
+                        }
+                        drawNodes = map.getNodesByIndex(i);
+                        leftNodes = map.getNodesByIndex(drawNodes.left);
+                        // light and shadow calculation (not like the one in the game!)
+                        j = data[i];
+                        g = 96;
+                        g += 12 * (data[ drawNodes.topRight ] - j);
+                        g += 8 * (data[ drawNodes.topLeft ] - j);
+                        g -= 8 * (data[ drawNodes.left ] - j);
+                        g -= 16 * (data[ leftNodes.bottomLeft ] - j);
+                        // keep value within valid range
+                        g = Math.max(Math.min(255, g), 0);
+                        // grab some textures
+                        textures = map.getTexturesByIndex(i);
+                        // get a few color indexes...
+                        c1 = (g + 256 * textureColorMerri[textures.topLeft]) * 4;
+                        c2 = (g + 256 * textureColorOriginal[textures.topLeft]) * 4;
+                        c3 = (g + 256 * textureColorMerri[textures.top]) * 4;
+                        c4 = (g + 256 * textureColorOriginal[textures.top]) * 4;
+                        c5 = (g + 256 * textureColorMerri[textures.topRight]) * 4;
+                        c6 = (g + 256 * textureColorOriginal[textures.topRight]) * 4;
+                        c7 = (g + 256 * textureColorMerri[textures.bottomLeft]) * 4;
+                        c8 = (g + 256 * textureColorOriginal[textures.bottomLeft]) * 4;
+                        c9 = (g + 256 * textureColorMerri[textures.bottom]) * 4;
+                        cA = (g + 256 * textureColorOriginal[textures.bottom]) * 4;
+                        cB = (g + 256 * textureColorMerri[textures.bottomRight]) * 4;
+                        cC = (g + 256 * textureColorOriginal[textures.bottomRight]) * 4;
+                        // then make a color mixture...
+                        color1 = ((color[c1++] + color[c2++] + color[c3++] + color[c4++] + color[c5++] + color[c6++] + color[c7++] + color[c8++] + color[c9++] + color[cA++] + color[cB++] + color[cC++]) / 12) | 0;
+                        color2 = ((color[c1++] + color[c2++] + color[c3++] + color[c4++] + color[c5++] + color[c6++] + color[c7++] + color[c8++] + color[c9++] + color[cA++] + color[cB++] + color[cC++]) / 12) | 0;
+                        color3 = ((color[c1++] + color[c2++] + color[c3++] + color[c4++] + color[c5++] + color[c6++] + color[c7++] + color[c8++] + color[c9++] + color[cA++] + color[cB++] + color[cC++]) / 12) | 0;
+                        // water is almost transparent (water only node = 255 - 160)
+                        colorAlpha = 255 - 30 * ((textures.topLeft === 5) + (textures.top === 5) + (textures.topRight === 5)
+                            + (textures.bottomLeft === 5) + (textures.bottom === 5) + (textures.bottomRight === 5));
+                        // not done yet! check for objects!
+                        switch (data[objectTypeBlock + i]) {
+                            // trees
+                            case 196:
+                            case 197:
+                            case 198:
+                            case 199:
+                                treeIndex = ((data[objectTypeBlock + i] & 2) << 2) | ((data[objectIndexBlock + i] & 0xC0) >> 6);
+                                g = TREE_INFO[options.terrain][treeIndex].ALPHA + (((data[objectIndexBlock + i] & 7) + 1) / 25) - 0.32;
+                                g2 = (1 - g);
+                                color1 = ~~(color1 * g2 + TREE_INFO[options.terrain][treeIndex].RED * g);
+                                color2 = ~~(color2 * g2 + TREE_INFO[options.terrain][treeIndex].GREEN * g);
+                                color3 = ~~(color3 * g2 + TREE_INFO[options.terrain][treeIndex].BLUE * g);
+                                break;
+                            // granite
+                            case 204:
+                            case 205:
+                                g = data[objectIndexBlock + i] / 10;
+                                g2 = ((color1 + color2 + color3) / 3 + 64) * g;
+                                color1 = Math.min(255, color1 * (1 - g) + g2);
+                                color2 = Math.min(255, color2 * (1 - g) + g2);
+                                color3 = Math.min(255, color3 * (1 - g) + g2);
+                                break;
+                            default:
+                        }
+                        view[drawPos++] = color1;
+                        view[drawPos++] = color2;
+                        view[drawPos++] = color3;
+                        view[drawPos++] = colorAlpha;
                     }
-                    drawNodes = map.getNodesByIndex(i);
-                    leftNodes = map.getNodesByIndex(drawNodes.left);
-                    // light and shadow calculation (not like the one in the game!)
-                    j = data[i];
-                    g = 96;
-                    g += 12 * (data[ drawNodes.topRight ] - j);
-                    g += 8 * (data[ drawNodes.topLeft ] - j);
-                    g -= 8 * (data[ drawNodes.left ] - j);
-                    g -= 16 * (data[ leftNodes.bottomLeft ] - j);
-                    // keep value within valid range
-                    g = Math.max(Math.min(255, g), 0);
-                    // grab some textures
-                    textures = map.getTexturesByIndex(i);
-                    // get a few color indexes...
-                    c1 = (g + 256 * textureColorMerri[textures.topLeft]) * 4;
-                    c2 = (g + 256 * textureColorOriginal[textures.topLeft]) * 4;
-                    c3 = (g + 256 * textureColorMerri[textures.top]) * 4;
-                    c4 = (g + 256 * textureColorOriginal[textures.top]) * 4;
-                    c5 = (g + 256 * textureColorMerri[textures.topRight]) * 4;
-                    c6 = (g + 256 * textureColorOriginal[textures.topRight]) * 4;
-                    c7 = (g + 256 * textureColorMerri[textures.bottomLeft]) * 4;
-                    c8 = (g + 256 * textureColorOriginal[textures.bottomLeft]) * 4;
-                    c9 = (g + 256 * textureColorMerri[textures.bottom]) * 4;
-                    cA = (g + 256 * textureColorOriginal[textures.bottom]) * 4;
-                    cB = (g + 256 * textureColorMerri[textures.bottomRight]) * 4;
-                    cC = (g + 256 * textureColorOriginal[textures.bottomRight]) * 4;
-                    // then make a color mixture...
-                    color1 = ((color[c1++] + color[c2++] + color[c3++] + color[c4++] + color[c5++] + color[c6++] + color[c7++] + color[c8++] + color[c9++] + color[cA++] + color[cB++] + color[cC++]) / 12) | 0;
-                    color2 = ((color[c1++] + color[c2++] + color[c3++] + color[c4++] + color[c5++] + color[c6++] + color[c7++] + color[c8++] + color[c9++] + color[cA++] + color[cB++] + color[cC++]) / 12) | 0;
-                    color3 = ((color[c1++] + color[c2++] + color[c3++] + color[c4++] + color[c5++] + color[c6++] + color[c7++] + color[c8++] + color[c9++] + color[cA++] + color[cB++] + color[cC++]) / 12) | 0;
-                    // water is almost transparent (water only node = 255 - 160)
-                    colorAlpha = 255 - 30 * ((textures.topLeft === 5) + (textures.top === 5) + (textures.topRight === 5)
-                        + (textures.bottomLeft === 5) + (textures.bottom === 5) + (textures.bottomRight === 5));
-                    // not done yet! check for objects!
-                    switch (data[objectTypeBlock + i]) {
-                    // trees
-                    case 196:
-                    case 197:
-                    case 198:
-                    case 199:
-                        treeIndex = ((data[objectTypeBlock + i] & 2) << 2) | ((data[objectIndexBlock + i] & 0xC0) >> 6);
-                        g = TREE_INFO[options.terrain][treeIndex].ALPHA + (((data[objectIndexBlock + i] & 7) + 1) / 25) - 0.32;
-                        g2 = (1 - g);
-                        color1 = ~~(color1 * g2 + TREE_INFO[options.terrain][treeIndex].RED * g);
-                        color2 = ~~(color2 * g2 + TREE_INFO[options.terrain][treeIndex].GREEN * g);
-                        color3 = ~~(color3 * g2 + TREE_INFO[options.terrain][treeIndex].BLUE * g);
-                        break;
-                    // granite
-                    case 204:
-                    case 205:
-                        g = data[objectIndexBlock + i] / 10;
-                        g2 = ((color1 + color2 + color3) / 3 + 64) * g;
-                        color1 = Math.min(255, color1 * (1 - g) + g2);
-                        color2 = Math.min(255, color2 * (1 - g) + g2);
-                        color3 = Math.min(255, color3 * (1 - g) + g2);
-                        break;
-                    default:
-                    }
-                    view[drawPos++] = color1;
-                    view[drawPos++] = color2;
-                    view[drawPos++] = color3;
-                    view[drawPos++] = colorAlpha;
-                }
-            })()
-            break;
-        default:
-            throw new Error('Unknown viewType option ' + options.viewType)
+                })()
+                break;
+            default:
+                throw new Error('Unknown viewType option ' + options.viewType)
         }
 
         buffer.putImageData(image, 0, 0);
