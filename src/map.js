@@ -1,11 +1,10 @@
 'use strict';
 
-var constants = require('./constants'),
-    AREA = constants.AREA,
+var constants = require('./constants')
+
+var AREA = constants.AREA,
     OBJECT_TYPE = constants.OBJECT_TYPE,
-    RESOURCE = constants.RESOURCE,
     SITE = constants.SITE,
-    TERRAIN = constants.TERRAIN,
     TEXTURE = constants.TEXTURE,
     TEXTURE_INFO = constants.TEXTURE_INFO;
 
@@ -23,7 +22,7 @@ var MAX_ELEVATION = 5,
     // calculateAreaMap
     EXTREME_AND_WET = TEXTURE.EXTREME | TEXTURE.WET;
 
-var Map = function(width, height) {
+var S2Map = function(width, height) {
     var _width = Math.abs(~~width) & 0x0FFC,
         _height = Math.abs(~~height) & 0x0FFC,
         _size = _width * _height,
@@ -45,27 +44,32 @@ var Map = function(width, height) {
         // indexes to each block
         _blockHeight = 0,
         _blockTextures = _size,
-        _blockTex1 = _size,
-        _blockTex2 = _size * 2,
-        _blockRoad = _size * 3,
+        // _blockTex1 = _size,
+        // _blockTex2 = _size * 2,
+        // _blockRoad = _size * 3,
         _blockObjects = _size * 4,
-        _blockObjIdx = _size * 4,
+        // _blockObjIdx = _size * 4,
         _blockObjType = _size * 5,
-        _blockAnimals = _size * 6,
-        _blockEmpty = _size * 7,    // unknown; always empty in WLD/SWD
+        // _blockAnimals = _size * 6,
+        // unknown; always empty in WLD/SWD
+        // _blockEmpty = _size * 7,
         _blockSites = _size * 8,
-        _blockOfSeven = _size * 9,  // everything is always 7 in WLD/SWD
-        _blockTouch = _size * 10,   // used here for temporary bitflagging and marking stuff
-        _blockRes = _size * 11,
+        // everything is always 7 in WLD/SWD
+        _blockOfSeven = _size * 9,
+        // used here for temporary bitflagging and marking stuff
+        _blockTouch = _size * 10,
+        // _blockRes = _size * 11,
         _blockLight = _size * 12,
         _blockArea = _size * 13;
 
     // always seven
-    for(var i = _blockOfSeven; i < _blockOfSeven + _size; i++) {
-        _rawMap[i] = 7;
-    }
+    (function(i) {
+        for (i = _blockOfSeven; i < _blockOfSeven + _size; i++) {
+            _rawMap[i] = 7;
+        }
+    })()
 
-    var calculateAreaMap = function() {
+    function calculateAreaMap() {
         var i,
             index = 0,
             areas = [],
@@ -73,13 +77,12 @@ var Map = function(width, height) {
             current,
             nodes,
             mass,
-            textures,
             total;
 
-        for(i = 0; i < _size; i++) {
-            if(_rawMap[_blockTouch + i] === 0x00) {
+        for (i = 0; i < _size; i++) {
+            if (_rawMap[_blockTouch + i] === 0x00) {
                 // see if it is water
-                if(index < 250 && isEachTextureSame(i, 0x05)) {
+                if (index < 250 && isEachTextureSame(i, 0x05)) {
                     // so we start looping water
                     _rawMap[_blockArea + i] = index;
                     _rawMap[_blockTouch + i] = 1;
@@ -87,43 +90,43 @@ var Map = function(width, height) {
                     // add index and bitmask while also reseting a few variables
                     _cache32bit[current = total = 0] = (i << 6) | 0x3F;
                     // this loop here is unoptimal, but does the job
-                    while(current <= total) {
+                    while (current <= total) {
                         // bitmask for nodes to follow (small optimization: always three bits active, one for each direction)
                         bitMask = _cache32bit[current] & 0x3F;
                         // get the nodes around
                         nodes = getNodesByIndex((_cache32bit[current++] & 0xFFFFFFC0) >> 6);
                         // check points for matching land/water
-                        if((bitMask & 0x01) === 0x01 && _rawMap[_blockTouch + nodes.left] === 0x00 && isEachTextureSame(nodes.left, 0x05)) {
+                        if ((bitMask & 0x01) === 0x01 && _rawMap[_blockTouch + nodes.left] === 0x00 && isEachTextureSame(nodes.left, 0x05)) {
                             _cache32bit[++total] = (nodes.left << 6) | 0x23;
                             _rawMap[_blockArea + nodes.left] = index;
                             _rawMap[_blockTouch + nodes.left] = 1;
                             mass++;
                         }
-                        if((bitMask & 0x02) === 0x02 && _rawMap[_blockTouch + nodes.topLeft] === 0x00 && isEachTextureSame(nodes.topLeft, 0x05)) {
+                        if ((bitMask & 0x02) === 0x02 && _rawMap[_blockTouch + nodes.topLeft] === 0x00 && isEachTextureSame(nodes.topLeft, 0x05)) {
                             _cache32bit[++total] = (nodes.topLeft << 6) | 0x07;
                             _rawMap[_blockArea + nodes.topLeft] = index;
                             _rawMap[_blockTouch + nodes.topLeft] = 1;
                             mass++;
                         }
-                        if((bitMask & 0x04) === 0x04 && _rawMap[_blockTouch + nodes.topRight] === 0x00 && isEachTextureSame(nodes.topRight, 0x05)) {
+                        if ((bitMask & 0x04) === 0x04 && _rawMap[_blockTouch + nodes.topRight] === 0x00 && isEachTextureSame(nodes.topRight, 0x05)) {
                             _cache32bit[++total] = (nodes.topRight << 6) | 0x0E;
                             _rawMap[_blockArea + nodes.topRight] = index;
                             _rawMap[_blockTouch + nodes.topRight] = 1;
                             mass++;
                         }
-                        if((bitMask & 0x08) === 0x08 && _rawMap[_blockTouch + nodes.right] === 0x00 && isEachTextureSame(nodes.right, 0x05)) {
+                        if ((bitMask & 0x08) === 0x08 && _rawMap[_blockTouch + nodes.right] === 0x00 && isEachTextureSame(nodes.right, 0x05)) {
                             _cache32bit[++total] = (nodes.right << 6) | 0x1C;
                             _rawMap[_blockArea + nodes.right] = index;
                             _rawMap[_blockTouch + nodes.right] = 1;
                             mass++;
                         }
-                        if((bitMask & 0x10) === 0x10 && _rawMap[_blockTouch + nodes.bottomRight] === 0x00 && isEachTextureSame(nodes.bottomRight, 0x05)) {
+                        if ((bitMask & 0x10) === 0x10 && _rawMap[_blockTouch + nodes.bottomRight] === 0x00 && isEachTextureSame(nodes.bottomRight, 0x05)) {
                             _cache32bit[++total] = (nodes.bottomRight << 6) | 0x38;
                             _rawMap[_blockArea + nodes.bottomRight] = index;
                             _rawMap[_blockTouch + nodes.bottomRight] = 1;
                             mass++;
                         }
-                        if((bitMask & 0x20) === 0x20 && _rawMap[_blockTouch + nodes.bottomLeft] === 0x00 && isEachTextureSame(nodes.bottomLeft, 0x05)) {
+                        if ((bitMask & 0x20) === 0x20 && _rawMap[_blockTouch + nodes.bottomLeft] === 0x00 && isEachTextureSame(nodes.bottomLeft, 0x05)) {
                             _cache32bit[++total] = (nodes.bottomLeft << 6) | 0x31;
                             _rawMap[_blockArea + nodes.bottomLeft] = index;
                             _rawMap[_blockTouch + nodes.bottomLeft] = 1;
@@ -138,10 +141,10 @@ var Map = function(width, height) {
                     };
                     // next index
                     index++;
-                } else if(isEachTextureWithAnyOfFlags(i, EXTREME_AND_WET)) {
+                } else if (isEachTextureWithAnyOfFlags(i, EXTREME_AND_WET)) {
                     _rawMap[_blockArea + i] = AREA.IMPASSABLE;
                     _rawMap[_blockTouch + i] = 1;
-                } else if(index < 250) {
+                } else if (index < 250) {
                     // so we start looping land
                     _rawMap[_blockArea + i] = index;
                     _rawMap[_blockTouch + i] = 1;
@@ -149,44 +152,50 @@ var Map = function(width, height) {
                     // add index and bitmask while also reseting a few variables
                     _cache32bit[current = total = 0] = (i << 6) | 0x3F;
                     // this loop here is unoptimal, but does the job
-                    while(current <= total) {
+                    while (current <= total) {
                         // bitmask for nodes to follow (small optimization: always three bits active, one for each direction)
                         bitMask = _cache32bit[current] & 0x3F;
                         // get the nodes around
                         nodes = getNodesByIndex((_cache32bit[current++] & 0xFFFFFFC0) >> 6);
                         // check points for matching land/water
-                        if((bitMask & 0x01) === 0x01 && _rawMap[_blockTouch + nodes.left] === 0x00 && !isEachTextureWithAnyOfFlags(nodes.left, EXTREME_AND_WET)) {
-                            _cache32bit[++total] = (nodes.left << 6) | 0x23; // topLeft, left, bottomLeft
+                        if ((bitMask & 0x01) === 0x01 && _rawMap[_blockTouch + nodes.left] === 0x00 && !isEachTextureWithAnyOfFlags(nodes.left, EXTREME_AND_WET)) {
+                            // topLeft, left, bottomLeft
+                            _cache32bit[++total] = (nodes.left << 6) | 0x23;
                             _rawMap[_blockArea + nodes.left] = index;
                             _rawMap[_blockTouch + nodes.left] = 1;
                             mass++;
                         }
-                        if((bitMask & 0x02) === 0x02 && _rawMap[_blockTouch + nodes.topLeft] === 0x00 && !isEachTextureWithAnyOfFlags(nodes.topLeft, EXTREME_AND_WET)) {
-                            _cache32bit[++total] = (nodes.topLeft << 6) | 0x07; // left, topLeft, topRight
+                        if ((bitMask & 0x02) === 0x02 && _rawMap[_blockTouch + nodes.topLeft] === 0x00 && !isEachTextureWithAnyOfFlags(nodes.topLeft, EXTREME_AND_WET)) {
+                            // left, topLeft, topRight
+                            _cache32bit[++total] = (nodes.topLeft << 6) | 0x07;
                             _rawMap[_blockArea + nodes.topLeft] = index;
                             _rawMap[_blockTouch + nodes.topLeft] = 1;
                             mass++;
                         }
-                        if((bitMask & 0x04) === 0x04 && _rawMap[_blockTouch + nodes.topRight] === 0x00 && !isEachTextureWithAnyOfFlags(nodes.topRight, EXTREME_AND_WET)) {
-                            _cache32bit[++total] = (nodes.topRight << 6) | 0x0E; // topLeft, topRight, right
+                        if ((bitMask & 0x04) === 0x04 && _rawMap[_blockTouch + nodes.topRight] === 0x00 && !isEachTextureWithAnyOfFlags(nodes.topRight, EXTREME_AND_WET)) {
+                            // topLeft, topRight, right
+                            _cache32bit[++total] = (nodes.topRight << 6) | 0x0E;
                             _rawMap[_blockArea + nodes.topRight] = index;
                             _rawMap[_blockTouch + nodes.topRight] = 1;
                             mass++;
                         }
-                        if((bitMask & 0x08) === 0x08 && _rawMap[_blockTouch + nodes.right] === 0x00 && !isEachTextureWithAnyOfFlags(nodes.right, EXTREME_AND_WET)) {
-                            _cache32bit[++total] = (nodes.right << 6) | 0x1C; // topRight, right, bottomRight
+                        if ((bitMask & 0x08) === 0x08 && _rawMap[_blockTouch + nodes.right] === 0x00 && !isEachTextureWithAnyOfFlags(nodes.right, EXTREME_AND_WET)) {
+                            // topRight, right, bottomRight
+                            _cache32bit[++total] = (nodes.right << 6) | 0x1C;
                             _rawMap[_blockArea + nodes.right] = index;
                             _rawMap[_blockTouch + nodes.right] = 1;
                             mass++;
                         }
-                        if((bitMask & 0x10) === 0x10 && _rawMap[_blockTouch + nodes.bottomRight] === 0x00 && !isEachTextureWithAnyOfFlags(nodes.bottomRight, EXTREME_AND_WET)) {
-                            _cache32bit[++total] = (nodes.bottomRight << 6) | 0x38; // right, bottomRight, bottomLeft
+                        if ((bitMask & 0x10) === 0x10 && _rawMap[_blockTouch + nodes.bottomRight] === 0x00 && !isEachTextureWithAnyOfFlags(nodes.bottomRight, EXTREME_AND_WET)) {
+                            // right, bottomRight, bottomLeft
+                            _cache32bit[++total] = (nodes.bottomRight << 6) | 0x38;
                             _rawMap[_blockArea + nodes.bottomRight] = index;
                             _rawMap[_blockTouch + nodes.bottomRight] = 1;
                             mass++;
                         }
-                        if((bitMask & 0x20) === 0x20 && _rawMap[_blockTouch + nodes.bottomLeft] === 0x00 && !isEachTextureWithAnyOfFlags(nodes.bottomLeft, EXTREME_AND_WET)) {
-                            _cache32bit[++total] = (nodes.bottomLeft << 6) | 0x31; // bottomRight, bottomLeft, left
+                        if ((bitMask & 0x20) === 0x20 && _rawMap[_blockTouch + nodes.bottomLeft] === 0x00 && !isEachTextureWithAnyOfFlags(nodes.bottomLeft, EXTREME_AND_WET)) {
+                            // bottomRight, bottomLeft, left
+                            _cache32bit[++total] = (nodes.bottomLeft << 6) | 0x31;
                             _rawMap[_blockArea + nodes.bottomLeft] = index;
                             _rawMap[_blockTouch + nodes.bottomLeft] = 1;
                             mass++;
@@ -214,21 +223,21 @@ var Map = function(width, height) {
         }
 
         //  cleanup
-        for(i = 0; i < _size; i++) {
+        for (i = 0; i < _size; i++) {
             _rawMap[_blockTouch + i] = 0;
         }
 
         return areas;
-    };
+    }
 
-    var calculateLightMap = function() {
+    function calculateLightMap() {
         var around,
             aroundLeft,
             i,
             j,
             k;
 
-        for(i = 0; i < _size; i++) {
+        for (i = 0; i < _size; i++) {
             j = 64;
             k = _rawMap[_blockHeight + i];
             around = getNodesByIndex(i);
@@ -239,12 +248,11 @@ var Map = function(width, height) {
             j -= 9 * (_rawMap[_blockHeight + aroundLeft.bottomLeft] - k);
             _rawMap[_blockLight + i] = Math.max(Math.min(128, j), 0);
         }
-    };
+    }
 
-    var calculateSiteMap = function() {
+    function calculateSiteMap() {
         var i,
             mines = 0,
-            node = 0,
             nodes,
             radiusNodes,
             tex1,
@@ -261,7 +269,7 @@ var Map = function(width, height) {
             waters = 0;
 
         // needs further investigation to the rules of original game; 99.9% correct for generated maps, but lacks information of ingame objects...
-        for(i = 0; i < _size; i++) {
+        for (i = 0; i < _size; i++) {
             // cache nearby nodes
             nodes = getNodesByIndex(i);
             // cache texture information
@@ -278,29 +286,26 @@ var Map = function(width, height) {
             tex9 = _rawMap[_blockTextures + texNodes.bottom] & TEXTURE.TO_ID_VALUE;
             texA = _rawMap[_blockTextures + texNodes.bottomRight] & TEXTURE.TO_ID_VALUE;
 
-            if ( ((TEXTURE_INFO[tex1].FLAG & TEXTURE.EXTREME) === TEXTURE.EXTREME)
+            if (
+                ((TEXTURE_INFO[tex1].FLAG & TEXTURE.EXTREME) === TEXTURE.EXTREME)
                 || ((TEXTURE_INFO[tex2].FLAG & TEXTURE.EXTREME) === TEXTURE.EXTREME)
                 || ((TEXTURE_INFO[tex3].FLAG & TEXTURE.EXTREME) === TEXTURE.EXTREME)
                 || ((TEXTURE_INFO[tex4].FLAG & TEXTURE.EXTREME) === TEXTURE.EXTREME)
                 || ((TEXTURE_INFO[tex5].FLAG & TEXTURE.EXTREME) === TEXTURE.EXTREME)
                 || ((TEXTURE_INFO[tex6].FLAG & TEXTURE.EXTREME) === TEXTURE.EXTREME)
                 // water or swamp
-                || 6 === (waters = ((TEXTURE_INFO[tex1].FLAG & TEXTURE.WET) === TEXTURE.WET)
+                || (waters = ((TEXTURE_INFO[tex1].FLAG & TEXTURE.WET) === TEXTURE.WET)
                 + ((TEXTURE_INFO[tex2].FLAG & TEXTURE.WET) === TEXTURE.WET)
                 + ((TEXTURE_INFO[tex3].FLAG & TEXTURE.WET) === TEXTURE.WET)
                 + ((TEXTURE_INFO[tex4].FLAG & TEXTURE.WET) === TEXTURE.WET)
                 + ((TEXTURE_INFO[tex5].FLAG & TEXTURE.WET) === TEXTURE.WET)
-                + ((TEXTURE_INFO[tex6].FLAG & TEXTURE.WET) === TEXTURE.WET) )
+                + ((TEXTURE_INFO[tex6].FLAG & TEXTURE.WET) === TEXTURE.WET)) === 6
                 // granite
                 || ((_rawMap[_blockObjType + i] & OBJECT_TYPE.MATCH) === OBJECT_TYPE.GRANITE)
             ) {
-
                 _rawMap[_blockSites + i] = SITE.IMPASSABLE;
-
-            } else if ( (_rawMap[_blockObjType + i] & OBJECT_TYPE.MATCH) === OBJECT_TYPE.TREE ) {
-
+            } else if ((_rawMap[_blockObjType + i] & OBJECT_TYPE.MATCH) === OBJECT_TYPE.TREE) {
                 _rawMap[_blockSites + i] = SITE.TREE;
-
             } else if (
                 // water nearby?
                 waters > 0
@@ -319,20 +324,19 @@ var Map = function(width, height) {
                 || ((TEXTURE_INFO[tex5].FLAG & TEXTURE.ARID) === TEXTURE.ARID)
                 || ((TEXTURE_INFO[tex6].FLAG & TEXTURE.ARID) === TEXTURE.ARID)
             ) {
-
                 // point next to a swamp, water (outdated comment? "or there is a tree in bottom right point!")
                 _rawMap[_blockSites + i] = SITE.FLAG_OCCUPIED;
-
-            } else if ( 6 === (mines = ((TEXTURE_INFO[tex1].FLAG & TEXTURE.ROCK) === TEXTURE.ROCK)
+            } else if ((mines = ((TEXTURE_INFO[tex1].FLAG & TEXTURE.ROCK) === TEXTURE.ROCK)
                 + ((TEXTURE_INFO[tex2].FLAG & TEXTURE.ROCK) === TEXTURE.ROCK)
                 + ((TEXTURE_INFO[tex3].FLAG & TEXTURE.ROCK) === TEXTURE.ROCK)
                 + ((TEXTURE_INFO[tex4].FLAG & TEXTURE.ROCK) === TEXTURE.ROCK)
                 + ((TEXTURE_INFO[tex5].FLAG & TEXTURE.ROCK) === TEXTURE.ROCK)
-                + ((TEXTURE_INFO[tex6].FLAG & TEXTURE.ROCK) === TEXTURE.ROCK) )
+                + ((TEXTURE_INFO[tex6].FLAG & TEXTURE.ROCK) === TEXTURE.ROCK)) === 6
                 // but some height rules apply to mines as well
                 && (_rawMap[i] - _rawMap[nodes.bottomRight]) >= -3
             ) {
-                if ( ((TEXTURE_INFO[tex7].FLAG & TEXTURE.EXTREME) === TEXTURE.EXTREME)
+                if (
+                    ((TEXTURE_INFO[tex7].FLAG & TEXTURE.EXTREME) === TEXTURE.EXTREME)
                     || ((TEXTURE_INFO[tex8].FLAG & TEXTURE.EXTREME) === TEXTURE.EXTREME)
                     || ((TEXTURE_INFO[tex9].FLAG & TEXTURE.EXTREME) === TEXTURE.EXTREME)
                     || ((TEXTURE_INFO[texA].FLAG & TEXTURE.EXTREME) === TEXTURE.EXTREME)
@@ -344,10 +348,8 @@ var Map = function(width, height) {
                     // woohoo, a mine!
                     _rawMap[_blockSites + i] = SITE.MINE_OCCUPIED;
                 }
-            } else if ( mines > 0 ) {
-
+            } else if (mines > 0) {
                 _rawMap[_blockSites + i] = SITE.FLAG_OCCUPIED;
-
             } else if (
                 ((_rawMap[_blockObjType + nodes.bottomRight] & OBJECT_TYPE.MATCH) === OBJECT_TYPE.TREE)
                 // height differences
@@ -361,23 +363,19 @@ var Map = function(width, height) {
             ) {
                 // so we can build a road, check for mountain meadow
                 if (tex1 === 0x12 || tex2 === 0x12 || tex3 === 0x12 || tex4 === 0x12 || tex5 === 0x12 || tex6 === 0x12) {
-
                     _rawMap[_blockSites + i] = SITE.FLAG_OCCUPIED;
-
                 } else {
-
                     _rawMap[_blockSites + i] = SITE.FLAG;
-
                 }
-            } else if ( ((TEXTURE_INFO[tex7].FLAG & TEXTURE.EXTREME) === TEXTURE.EXTREME)
+            } else if (
+                ((TEXTURE_INFO[tex7].FLAG & TEXTURE.EXTREME) === TEXTURE.EXTREME)
                 || ((TEXTURE_INFO[tex8].FLAG & TEXTURE.EXTREME) === TEXTURE.EXTREME)
                 || ((TEXTURE_INFO[tex9].FLAG & TEXTURE.EXTREME) === TEXTURE.EXTREME)
                 || ((TEXTURE_INFO[texA].FLAG & TEXTURE.EXTREME) === TEXTURE.EXTREME)
             ) {
-
                 _rawMap[_blockSites + i] = SITE.FLAG_OCCUPIED;
-
-            } else if ( ((_rawMap[_blockObjType + nodes.topLeft] & OBJECT_TYPE.MATCH) === OBJECT_TYPE.TREE)
+            } else if (
+                ((_rawMap[_blockObjType + nodes.topLeft] & OBJECT_TYPE.MATCH) === OBJECT_TYPE.TREE)
                 || ((_rawMap[_blockObjType + nodes.topRight] & OBJECT_TYPE.MATCH) === OBJECT_TYPE.TREE)
                 || ((_rawMap[_blockObjType + nodes.left] & OBJECT_TYPE.MATCH) === OBJECT_TYPE.TREE)
                 || ((_rawMap[_blockObjType + nodes.right] & OBJECT_TYPE.MATCH) === OBJECT_TYPE.TREE)
@@ -399,31 +397,20 @@ var Map = function(width, height) {
             ) {
                 // can build a hut, check for mountain meadow texture
                 if (tex1 === 0x12 || tex2 === 0x12 || tex3 === 0x12 || tex4 === 0x12 || tex5 === 0x12 || tex6 === 0x12) {
-
                     _rawMap[_blockSites + i] = SITE.HUT_OCCUPIED;
-
                 } else {
-
                     _rawMap[_blockSites + i] = SITE.HUT;
-
                 }
+            // can build a castle, check for mountain meadow texture
+            } else if (tex1 === 0x12 || tex2 === 0x12 || tex3 === 0x12 || tex4 === 0x12 || tex5 === 0x12 || tex6 === 0x12) {
+                _rawMap[_blockSites + i] = SITE.CASTLE_OCCUPIED;
             } else {
-                // can build a castle, check for mountain meadow texture
-                if (tex1 === 0x12 || tex2 === 0x12 || tex3 === 0x12 || tex4 === 0x12 || tex5 === 0x12 || tex6 === 0x12) {
-
-                    _rawMap[_blockSites + i] = SITE.CASTLE_OCCUPIED;
-
-                } else {
-
-                    _rawMap[_blockSites + i] = SITE.CASTLE;
-
-                }
+                _rawMap[_blockSites + i] = SITE.CASTLE;
             }
         }
-    };
+    }
 
-    // TODO: replace mark array with _cache32bit to improve performance
-    var changeHeight = function(x, y, radius, strength) {
+    function changeHeight(x, y, radius, strength) {
         var newHeight,
             nodes,
             diff,
@@ -433,32 +420,51 @@ var Map = function(width, height) {
             k,
             index,
             around,
+            // array should be replaced with _cache32bit to improve performance
             mark = [],
             marked;
         // sanitize
         strength = ~~strength;
         radius = Math.abs(~~radius);
         // optimize for speed by reducing unnecessary processing related to being positive or negative
-        if(strength < 0) {
-            if(strength < -MAX_ELEVATION) strength = -MAX_ELEVATION;
+        if (strength < 0) {
+            if (strength < -MAX_ELEVATION) {
+                strength = -MAX_ELEVATION;
+            }
             nodes = getRadiusNodes(x, y, radius);
-            for(i = 0; i < nodes.length; i++) {
+            for (i = 0; i < nodes.length; i++) {
                 index = nodes[i];
                 newHeight = _rawMap[index] + strength;
-                if(newHeight < 0) newHeight = 0;
+                if (newHeight < 0) {
+                    newHeight = 0;
+                }
                 // any change?
-                if(_rawMap[index] !== newHeight) {
+                if (_rawMap[index] !== newHeight) {
                     _rawMap[index] = newHeight;
                     // get nodes around the current index
                     around = getNodesByIndex(index);
                     // store in an array that we use to clean up the _blockTouch
-                    if(_rawMap[_blockTouch + index] === 0) mark.push(index);
-                    if(_rawMap[_blockTouch + around.left] === 0) mark.push(around.left);
-                    if(_rawMap[_blockTouch + around.right] === 0) mark.push(around.right);
-                    if(_rawMap[_blockTouch + around.topLeft] === 0) mark.push(around.topLeft);
-                    if(_rawMap[_blockTouch + around.topRight] === 0) mark.push(around.topRight);
-                    if(_rawMap[_blockTouch + around.bottomLeft] === 0) mark.push(around.bottomLeft);
-                    if(_rawMap[_blockTouch + around.bottomRight] === 0) mark.push(around.bottomRight);
+                    if (_rawMap[_blockTouch + index] === 0) {
+                        mark.push(index);
+                    }
+                    if (_rawMap[_blockTouch + around.left] === 0) {
+                        mark.push(around.left);
+                    }
+                    if (_rawMap[_blockTouch + around.right] === 0) {
+                        mark.push(around.right);
+                    }
+                    if (_rawMap[_blockTouch + around.topLeft] === 0) {
+                        mark.push(around.topLeft);
+                    }
+                    if (_rawMap[_blockTouch + around.topRight] === 0) {
+                        mark.push(around.topRight);
+                    }
+                    if (_rawMap[_blockTouch + around.bottomLeft] === 0) {
+                        mark.push(around.bottomLeft);
+                    }
+                    if (_rawMap[_blockTouch + around.bottomRight] === 0) {
+                        mark.push(around.bottomRight);
+                    }
                     // mark the level of touch so we know how to avoid doing unnecessary work
                     _rawMap[_blockTouch + index] |= TOUCH_MARKED;
                     _rawMap[_blockTouch + around.left] |= TOUCH_FROM_RIGHT;
@@ -470,26 +476,44 @@ var Map = function(width, height) {
                 }
             }
             marked = nodes.length;
-        } else if(strength > 0) {
-            if(strength > MAX_ELEVATION) strength = MAX_ELEVATION;
+        } else if (strength > 0) {
+            if (strength > MAX_ELEVATION) {
+                strength = MAX_ELEVATION;
+            }
             nodes = getRadiusNodes(x, y, radius);
-            for(i = 0; i < nodes.length; i++) {
+            for (i = 0; i < nodes.length; i++) {
                 index = nodes[i];
                 newHeight = _rawMap[index] + strength;
-                if(newHeight > MAX_HEIGHT) newHeight = MAX_HEIGHT;
+                if (newHeight > MAX_HEIGHT) {
+                    newHeight = MAX_HEIGHT;
+                }
                 // any change?
-                if(_rawMap[index] !== newHeight) {
+                if (_rawMap[index] !== newHeight) {
                     _rawMap[index] = newHeight;
                     // get nodes around the current index
                     around = getNodesByIndex(index);
                     // store in an array that we use to clean up the _blockTouch
-                    if(_rawMap[_blockTouch + index] === 0) mark.push(index);
-                    if(_rawMap[_blockTouch + around.left] === 0) mark.push(around.left);
-                    if(_rawMap[_blockTouch + around.right] === 0) mark.push(around.right);
-                    if(_rawMap[_blockTouch + around.topLeft] === 0) mark.push(around.topLeft);
-                    if(_rawMap[_blockTouch + around.topRight] === 0) mark.push(around.topRight);
-                    if(_rawMap[_blockTouch + around.bottomLeft] === 0) mark.push(around.bottomLeft);
-                    if(_rawMap[_blockTouch + around.bottomRight] === 0) mark.push(around.bottomRight);
+                    if (_rawMap[_blockTouch + index] === 0) {
+                        mark.push(index);
+                    }
+                    if (_rawMap[_blockTouch + around.left] === 0) {
+                        mark.push(around.left);
+                    }
+                    if (_rawMap[_blockTouch + around.right] === 0) {
+                        mark.push(around.right);
+                    }
+                    if (_rawMap[_blockTouch + around.topLeft] === 0) {
+                        mark.push(around.topLeft);
+                    }
+                    if (_rawMap[_blockTouch + around.topRight] === 0) {
+                        mark.push(around.topRight);
+                    }
+                    if (_rawMap[_blockTouch + around.bottomLeft] === 0) {
+                        mark.push(around.bottomLeft);
+                    }
+                    if (_rawMap[_blockTouch + around.bottomRight] === 0) {
+                        mark.push(around.bottomRight);
+                    }
                     // mark the level of touch so we know how to avoid doing unnecessary work
                     _rawMap[_blockTouch + index] |= TOUCH_MARKED;
                     _rawMap[_blockTouch + around.left] |= TOUCH_FROM_RIGHT;
@@ -502,12 +526,12 @@ var Map = function(width, height) {
             }
             marked = nodes.length;
         }
-        while(mark.length > marked) {
-            for(i = 0; i < mark.length; i++) {
+        while (mark.length > marked) {
+            for (i = 0; i < mark.length; i++) {
                 index = mark[i];
                 j = _rawMap[_blockTouch + index];
                 // are we done with this node already?
-                if((j & TOUCH_MARKED) === 0) {
+                if ((j & TOUCH_MARKED) === 0) {
                     // we have processed it now!
                     _rawMap[_blockTouch + index] |= TOUCH_MARKED;
                     marked++;
@@ -518,65 +542,89 @@ var Map = function(width, height) {
                     // get the surrounding nodes
                     around = getNodesByIndex(index);
                     // see if we need to adjust the elevation of this node
-                    if(j & TOUCH_FROM_RIGHT) {
+                    if (j & TOUCH_FROM_RIGHT) {
                         diff = k - _rawMap[around.right];
-                        if(Math.abs(diff) > MAX_ELEVATION && Math.abs(diff) > Math.abs(maxDiff)) maxDiff = diff;
+                        if (Math.abs(diff) > MAX_ELEVATION && Math.abs(diff) > Math.abs(maxDiff)) {
+                            maxDiff = diff;
+                        }
                     }
-                    if(j & TOUCH_FROM_LEFT) {
+                    if (j & TOUCH_FROM_LEFT) {
                         diff = k - _rawMap[around.left];
-                        if(Math.abs(diff) > MAX_ELEVATION && Math.abs(diff) > Math.abs(maxDiff)) maxDiff = diff;
+                        if (Math.abs(diff) > MAX_ELEVATION && Math.abs(diff) > Math.abs(maxDiff)) {
+                            maxDiff = diff;
+                        }
                     }
-                    if(j & TOUCH_FROM_TOP_LEFT) {
+                    if (j & TOUCH_FROM_TOP_LEFT) {
                         diff = k - _rawMap[around.topLeft];
-                        if(Math.abs(diff) > MAX_ELEVATION && Math.abs(diff) > Math.abs(maxDiff)) maxDiff = diff;
+                        if (Math.abs(diff) > MAX_ELEVATION && Math.abs(diff) > Math.abs(maxDiff)) {
+                            maxDiff = diff;
+                        }
                     }
-                    if(j & TOUCH_FROM_BOTTOM_RIGHT) {
+                    if (j & TOUCH_FROM_BOTTOM_RIGHT) {
                         diff = k - _rawMap[around.bottomRight];
-                        if(Math.abs(diff) > MAX_ELEVATION && Math.abs(diff) > Math.abs(maxDiff)) maxDiff = diff;
+                        if (Math.abs(diff) > MAX_ELEVATION && Math.abs(diff) > Math.abs(maxDiff)) {
+                            maxDiff = diff;
+                        }
                     }
-                    if(j & TOUCH_FROM_TOP_RIGHT) {
+                    if (j & TOUCH_FROM_TOP_RIGHT) {
                         diff = k - _rawMap[around.topRight];
-                        if(Math.abs(diff) > MAX_ELEVATION && Math.abs(diff) > Math.abs(maxDiff)) maxDiff = diff;
+                        if (Math.abs(diff) > MAX_ELEVATION && Math.abs(diff) > Math.abs(maxDiff)) {
+                            maxDiff = diff;
+                        }
                     }
-                    if(j & TOUCH_FROM_BOTTOM_LEFT) {
+                    if (j & TOUCH_FROM_BOTTOM_LEFT) {
                         diff = k - _rawMap[around.bottomLeft];
-                        if(Math.abs(diff) > MAX_ELEVATION && Math.abs(diff) > Math.abs(maxDiff)) maxDiff = diff;
+                        if (Math.abs(diff) > MAX_ELEVATION && Math.abs(diff) > Math.abs(maxDiff)) {
+                            maxDiff = diff;
+                        }
                     }
                     // okay, do we have anything to change in this node?
-                    if(maxDiff) {
+                    if (maxDiff) {
                         // calculate how much to change the height in this node
-                        if(maxDiff < 0) maxDiff += MAX_ELEVATION;
-                        else if(maxDiff > 0) maxDiff -= MAX_ELEVATION;
+                        if (maxDiff < 0) {
+                            maxDiff += MAX_ELEVATION;
+                        } else if (maxDiff > 0) {
+                            maxDiff -= MAX_ELEVATION;
+                        }
                         // now we know how much change has to be done
                         newHeight = k - maxDiff;
-                        // TODO: commented out because these two lines should never get executed anyway, so remove later?
-                        //if(newHeight < 0) { newHeight = 0; }
-                        //else if(newHeight > MAX_HEIGHT) { newHeight = MAX_HEIGHT; }
                         // it is always a good idea to draw your changes
                         _rawMap[index] = newHeight;
                         // mark the level of touch so we know how to avoid doing unnecessary work
-                        if((j & TOUCH_FROM_LEFT) === 0) {
-                            if(_rawMap[_blockTouch + around.left] === 0) mark.push(around.left);
+                        if ((j & TOUCH_FROM_LEFT) === 0) {
+                            if (_rawMap[_blockTouch + around.left] === 0) {
+                                mark.push(around.left);
+                            }
                             _rawMap[_blockTouch + around.left] |= TOUCH_FROM_RIGHT;
                         }
-                        if((j & TOUCH_FROM_RIGHT) === 0) {
-                            if(_rawMap[_blockTouch + around.right] === 0) mark.push(around.right);
+                        if ((j & TOUCH_FROM_RIGHT) === 0) {
+                            if (_rawMap[_blockTouch + around.right] === 0) {
+                                mark.push(around.right);
+                            }
                             _rawMap[_blockTouch + around.right] |= TOUCH_FROM_LEFT;
                         }
-                        if((j & TOUCH_FROM_TOP_LEFT) === 0) {
-                            if(_rawMap[_blockTouch + around.topLeft] === 0) mark.push(around.topLeft);
+                        if ((j & TOUCH_FROM_TOP_LEFT) === 0) {
+                            if (_rawMap[_blockTouch + around.topLeft] === 0) {
+                                mark.push(around.topLeft);
+                            }
                             _rawMap[_blockTouch + around.topLeft] |= TOUCH_FROM_BOTTOM_RIGHT;
                         }
-                        if((j & TOUCH_FROM_BOTTOM_RIGHT) === 0) {
-                            if(_rawMap[_blockTouch + around.bottomRight] === 0) mark.push(around.bottomRight);
+                        if ((j & TOUCH_FROM_BOTTOM_RIGHT) === 0) {
+                            if (_rawMap[_blockTouch + around.bottomRight] === 0) {
+                                mark.push(around.bottomRight);
+                            }
                             _rawMap[_blockTouch + around.bottomRight] |= TOUCH_FROM_TOP_LEFT;
                         }
-                        if((j & TOUCH_FROM_TOP_RIGHT) === 0) {
-                            if(_rawMap[_blockTouch + around.topRight] === 0) mark.push(around.topRight);
+                        if ((j & TOUCH_FROM_TOP_RIGHT) === 0) {
+                            if (_rawMap[_blockTouch + around.topRight] === 0) {
+                                mark.push(around.topRight);
+                            }
                             _rawMap[_blockTouch + around.topRight] |= TOUCH_FROM_BOTTOM_LEFT;
                         }
-                        if((j & TOUCH_FROM_BOTTOM_LEFT) === 0) {
-                            if(_rawMap[_blockTouch + around.bottomLeft] === 0) mark.push(around.bottomLeft);
+                        if ((j & TOUCH_FROM_BOTTOM_LEFT) === 0) {
+                            if (_rawMap[_blockTouch + around.bottomLeft] === 0) {
+                                mark.push(around.bottomLeft);
+                            }
                             _rawMap[_blockTouch + around.bottomLeft] |= TOUCH_FROM_TOP_RIGHT;
                         }
                     }
@@ -584,38 +632,38 @@ var Map = function(width, height) {
             }
         }
         // clean our changes in the touch block
-        for(i = 0; i < mark.length; i++) {
+        for (i = 0; i < mark.length; i++) {
             _rawMap[_blockTouch + mark[i]] = 0;
         }
-    };
+    }
 
-    var getAllSitesOfType = function(siteType, strictMode) {
+    function getAllSitesOfType(siteType, strictMode) {
         var i,
             mask = 0xFF,
             sites = [];
 
-        if(!strictMode && (siteType & 0xF0) === 0) {
+        if (!strictMode && (siteType & 0xF0) === 0) {
             mask = 0x0F;
             siteType &= mask;
         }
 
-        for(i = 0; i < _size; i++) {
-            if((_rawMap[_blockSites + i] & mask) === siteType) {
+        for (i = 0; i < _size; i++) {
+            if ((_rawMap[_blockSites + i] & mask) === siteType) {
                 sites.push(i);
             }
         }
 
         return sites;
-    };
+    }
 
-    var getBlock = function(index) {
+    function getBlock(index) {
         index = ~~index;
-        if(index >= 0 && index <= 13) {
+        if (index >= 0 && index <= 13) {
             return _rawMap.subarray(index * _size, ++index * _size);
         }
-    };
+    }
 
-    var getNodesByIndex = function(index) {
+    function getNodesByIndex(index) {
         var x = index % _width,
             y = (index - x) / _width,
             xL = (x > 0 ? x : _width) - 1,
@@ -626,7 +674,7 @@ var Map = function(width, height) {
 
         y *= _width;
 
-        if(odd) {
+        if (odd) {
             // odd
             return {
                 left: y + xL,
@@ -636,31 +684,30 @@ var Map = function(width, height) {
                 bottomLeft: yB + x,
                 bottomRight: yB + xR
             }
-        } else {
-            // even
-            return {
-                left: y + xL,
-                right: y + xR,
-                topLeft: yT + xL,
-                topRight: yT + x,
-                bottomLeft: yB + xL,
-                bottomRight: yB + x
-            }
         }
-    };
+        // even
+        return {
+            left: y + xL,
+            right: y + xR,
+            topLeft: yT + xL,
+            topRight: yT + x,
+            bottomLeft: yB + xL,
+            bottomRight: yB + x
+        }
+    }
 
     // return array of indexes for nearby points
     // outset = boolean, return only the outermost radius points
     // WARNING! This function has quite an aggressive cache, you should not make two calls in a row!
     // ie. don't do var a = getRadiusNodes(), b = getRadiusNodes() as BOTH will have the results of "b"
-    var getRadiusNodes = function(x, y, radius, outset) {
+    function getRadiusNodes(x, y, radius, outset) {
         var nodes,
             i,
             j,
             k = 0,
             l,
             m,
-            removeLast = 0 === (y & 1),
+            removeLast = (y & 1) === 0,
             xMin,
             xMax,
             yIndex,
@@ -670,8 +717,8 @@ var Map = function(width, height) {
         radius = Math.abs(~~radius);
         outset = !!outset;
         // see if we add the point itself to result blocks
-        if(radius === 0) {
-            if(!_cacheRadius[radius]) {
+        if (radius === 0) {
+            if (!_cacheRadius[radius]) {
                 _cacheRadius[radius] = new Uint32Array(1);
             }
             nodes = _cacheRadius[radius];
@@ -680,60 +727,65 @@ var Map = function(width, height) {
         } else {
             // some limits have to be in place
             maxRadius = ~~((Math.min(_width, _height) - 2) / 2);
-            if(radius > maxRadius) radius = maxRadius;
+            if (radius > maxRadius) {
+                radius = maxRadius;
+            }
             // calculate some helper variables
             xMin = (_width + x - radius) % _width;
             xMax = (x + radius) % _width;
             l = m = yIndex = y * _width;
             // all nodes or only the edge nodes?
-            if(!outset) {
-                if(!_cacheRadius[radius]) {
+            if (!outset) {
+                if (!_cacheRadius[radius]) {
                     // calculate the total size of resulting array
                     _cacheRadius[radius] = new Uint32Array(1 + 6 * (radius * (radius + 1) >> 1));
                 }
                 nodes = _cacheRadius[radius];
                 // start pushing out the results
-                if(xMin < xMax) {
-                    for(i = xMin; i <= xMax; i++) {
+                if (xMin < xMax) {
+                    for (i = xMin; i <= xMax; i++) {
                         nodes[k++] = yIndex + i;
                     }
                 } else {
-                    for(i = xMin; i < _width; i++) {
+                    for (i = xMin; i < _width; i++) {
                         nodes[k++] = yIndex + i;
                     }
-                    for(i = 0; i <= xMax; i++) {
+                    for (i = 0; i <= xMax; i++) {
                         nodes[k++] = yIndex + i;
                     }
                 }
                 // then all the other Y rows
-                for(j = 1; j <= radius; j++) {
-                    if(removeLast) {
-                        if(xMax > 0) xMax--;
-                        else xMax = _width - 1;
+                for (j = 1; j <= radius; j++) {
+                    if (removeLast) {
+                        if (xMax > 0) {
+                            xMax--;
+                        } else {
+                            xMax = _width - 1;
+                        }
                     } else {
                         xMin = ++xMin % _width;
                     }
                     removeLast = !removeLast;
                     l = (_size + l - _width) % _size;
                     m = (m + _width) % _size;
-                    if(xMin < xMax) {
-                        for(i = xMin; i <= xMax; i++) {
+                    if (xMin < xMax) {
+                        for (i = xMin; i <= xMax; i++) {
                             nodes[k++] = l + i;
                             nodes[k++] = m + i;
                         }
                     } else {
-                        for(i = xMin; i < _width; i++) {
+                        for (i = xMin; i < _width; i++) {
                             nodes[k++] = l + i;
                             nodes[k++] = m + i;
                         }
-                        for(i = 0; i <= xMax; i++) {
+                        for (i = 0; i <= xMax; i++) {
                             nodes[k++] = l + i;
                             nodes[k++] = m + i;
                         }
                     }
                 }
             } else {
-                if(!_cacheRadiusOutset[radius]) {
+                if (!_cacheRadiusOutset[radius]) {
                     // calculate the total size of resulting array
                     _cacheRadiusOutset[radius] = new Uint32Array(6 * radius);
                 }
@@ -742,10 +794,13 @@ var Map = function(width, height) {
                 nodes[k++] = yIndex + xMin;
                 nodes[k++] = yIndex + xMax;
                 // first and last on all lines except the topmost and bottommost row
-                for(j = 1; j < radius; j++) {
-                    if(removeLast) {
-                        if(xMax > 0) xMax--;
-                        else xMax = _width - 1;
+                for (j = 1; j < radius; j++) {
+                    if (removeLast) {
+                        if (xMax > 0) {
+                            xMax--;
+                        } else {
+                            xMax = _width - 1;
+                        }
                     } else {
                         xMin = ++xMin % _width;
                     }
@@ -758,25 +813,28 @@ var Map = function(width, height) {
                     nodes[k++] = m + xMax;
                 }
                 // all nodes in topmost and bottommost row
-                if(removeLast) {
-                    if(xMax > 0) xMax--;
-                    else xMax = _width - 1;
+                if (removeLast) {
+                    if (xMax > 0) {
+                        xMax--;
+                    } else {
+                        xMax = _width - 1;
+                    }
                 } else {
                     xMin = ++xMin % _width;
                 }
                 l = (_size + l - _width) % _size;
                 m = (m + _width) % _size;
-                if(xMin < xMax) {
-                    for(i = xMin; i <= xMax; i++) {
+                if (xMin < xMax) {
+                    for (i = xMin; i <= xMax; i++) {
                         nodes[k++] = l + i;
                         nodes[k++] = m + i;
                     }
                 } else {
-                    for(i = xMin; i < _width; i++) {
+                    for (i = xMin; i < _width; i++) {
                         nodes[k++] = l + i;
                         nodes[k++] = m + i;
                     }
-                    for(i = 0; i <= xMax; i++) {
+                    for (i = 0; i <= xMax; i++) {
                         nodes[k++] = l + i;
                         nodes[k++] = m + i;
                     }
@@ -785,13 +843,13 @@ var Map = function(width, height) {
         }
 
         return nodes;
-    };
+    }
 
-    var getRawData = function() {
+    function getRawData() {
         return _rawMap;
-    };
+    }
 
-    var getTextureNodesByIndex = function(index) {
+    function getTextureNodesByIndex(index) {
         var x = index % _width,
             y = (index - x) / _width,
             xL = (x > 0 ? x : _width) - 1,
@@ -801,7 +859,7 @@ var Map = function(width, height) {
 
         y *= _width;
 
-        if(odd) {
+        if (odd) {
             // only needed here
             xR = (x + 1) % _width
             // odd
@@ -813,21 +871,20 @@ var Map = function(width, height) {
                 top: yT + x + _size,
                 topRight: yT + xR
             }
-        } else {
-            // even
-            return {
-                bottomLeft: y + xL + _size,
-                bottom: index,
-                bottomRight: index + _size,
-                topLeft: yT + xL,
-                top: yT + xL + _size,
-                topRight: yT + x
-            }
         }
-    };
+        // even
+        return {
+            bottomLeft: y + xL + _size,
+            bottom: index,
+            bottomRight: index + _size,
+            topLeft: yT + xL,
+            top: yT + xL + _size,
+            topRight: yT + x
+        }
+    }
 
     // will not maintain harbor flag
-    var getTexturesByIndex = function(index) {
+    function getTexturesByIndex(index) {
         var nodes = getTextureNodesByIndex(index);
 
         return {
@@ -838,43 +895,46 @@ var Map = function(width, height) {
             bottom: _rawMap[_blockTextures + nodes.bottom] & TEXTURE.TO_ID_VALUE,
             bottomRight: _rawMap[_blockTextures + nodes.bottomRight] & TEXTURE.TO_ID_VALUE
         }
-    };
+    }
 
     // flats out the height map, doesn't do anything else
-    var initializeHeight = function(baseLevel) {
+    function initializeHeight(baseLevel) {
         var i;
 
         baseLevel = ~~baseLevel;
 
-        if(baseLevel < 0) baseLevel = 0;
-        else if(baseLevel > MAX_HEIGHT) baseLevel = MAX_HEIGHT;
+        if (baseLevel < 0) {
+            baseLevel = 0;
+        } else if (baseLevel > MAX_HEIGHT) {
+            baseLevel = MAX_HEIGHT;
+        }
 
-        for(i = 0; i < _size; i++) {
+        for (i = 0; i < _size; i++) {
             _rawMap[_blockHeight + i] = baseLevel;
         }
-    };
+    }
 
-    var initializeTexture = function(texture) {
+    function initializeTexture(texture) {
         var i;
         // sanitize
         texture = Math.abs(~~texture) & TEXTURE.TO_ID_VALUE;
         // is this a known texture?
-        if(TEXTURE_INFO[texture]) {
-            for(i = 0; i < _size * 2; i++) {
+        if (TEXTURE_INFO[texture]) {
+            for (i = 0; i < _size * 2; i++) {
                 _rawMap[_blockTextures + i] = texture;
             }
         }
-    };
+    }
 
-    var initializeObjects = function() {
+    function initializeObjects() {
         var i;
         // simply wipe everything
-        for(i = 0; i < _size * 2; i++) {
+        for (i = 0; i < _size * 2; i++) {
             _rawMap[_blockObjects + i] = 0;
         }
-    };
+    }
 
-    var isAnyTextureWithAnyOfFlags = function(index, flags) {
+    function isAnyTextureWithAnyOfFlags(index, flags) {
         var nodes,
             topLeft,
             top,
@@ -883,7 +943,7 @@ var Map = function(width, height) {
             bottom,
             bottomRight;
 
-        if(_lastTextureIndex === index) {
+        if (_lastTextureIndex === index) {
             topLeft = _lastTextureTopLeft;
             top = _lastTextureTop;
             topRight = _lastTextureTopRight;
@@ -893,23 +953,23 @@ var Map = function(width, height) {
         } else {
             nodes = getTextureNodesByIndex(index);
             _lastTextureIndex = index;
-            _lastTextureTopLeft     = topLeft     = _rawMap[_blockTextures + nodes.topLeft    ] & TEXTURE.TO_ID_VALUE;
-            _lastTextureTop         = top         = _rawMap[_blockTextures + nodes.top        ] & TEXTURE.TO_ID_VALUE;
-            _lastTextureTopRight    = topRight    = _rawMap[_blockTextures + nodes.topRight   ] & TEXTURE.TO_ID_VALUE;
-            _lastTextureBottomLeft  = bottomLeft  = _rawMap[_blockTextures + nodes.bottomLeft ] & TEXTURE.TO_ID_VALUE;
-            _lastTextureBottom      = bottom      = _rawMap[_blockTextures + nodes.bottom     ] & TEXTURE.TO_ID_VALUE;
+            _lastTextureTopLeft = topLeft = _rawMap[_blockTextures + nodes.topLeft] & TEXTURE.TO_ID_VALUE;
+            _lastTextureTop = top = _rawMap[_blockTextures + nodes.top] & TEXTURE.TO_ID_VALUE;
+            _lastTextureTopRight = topRight = _rawMap[_blockTextures + nodes.topRight] & TEXTURE.TO_ID_VALUE;
+            _lastTextureBottomLeft = bottomLeft = _rawMap[_blockTextures + nodes.bottomLeft] & TEXTURE.TO_ID_VALUE;
+            _lastTextureBottom = bottom = _rawMap[_blockTextures + nodes.bottom] & TEXTURE.TO_ID_VALUE;
             _lastTextureBottomRight = bottomRight = _rawMap[_blockTextures + nodes.bottomRight] & TEXTURE.TO_ID_VALUE;
         }
 
-        return !!(TEXTURE_INFO[topLeft    ].FLAG & flags)
-            || !!(TEXTURE_INFO[top        ].FLAG & flags)
-            || !!(TEXTURE_INFO[topRight   ].FLAG & flags)
-            || !!(TEXTURE_INFO[bottomLeft ].FLAG & flags)
-            || !!(TEXTURE_INFO[bottom     ].FLAG & flags)
+        return !!(TEXTURE_INFO[topLeft].FLAG & flags)
+            || !!(TEXTURE_INFO[top].FLAG & flags)
+            || !!(TEXTURE_INFO[topRight].FLAG & flags)
+            || !!(TEXTURE_INFO[bottomLeft].FLAG & flags)
+            || !!(TEXTURE_INFO[bottom].FLAG & flags)
             || !!(TEXTURE_INFO[bottomRight].FLAG & flags);
-    };
+    }
 
-    var isEachTextureSame = function(index, texture) {
+    function isEachTextureSame(index, texture) {
         var nodes,
             topLeft,
             top,
@@ -918,7 +978,7 @@ var Map = function(width, height) {
             bottom,
             bottomRight;
 
-        if(_lastTextureIndex === index) {
+        if (_lastTextureIndex === index) {
             topLeft = _lastTextureTopLeft;
             top = _lastTextureTop;
             topRight = _lastTextureTopRight;
@@ -928,11 +988,11 @@ var Map = function(width, height) {
         } else {
             nodes = getTextureNodesByIndex(index);
             _lastTextureIndex = index;
-            _lastTextureTopLeft     = topLeft     = _rawMap[_blockTextures + nodes.topLeft    ] & TEXTURE.TO_ID_VALUE;
-            _lastTextureTop         = top         = _rawMap[_blockTextures + nodes.top        ] & TEXTURE.TO_ID_VALUE;
-            _lastTextureTopRight    = topRight    = _rawMap[_blockTextures + nodes.topRight   ] & TEXTURE.TO_ID_VALUE;
-            _lastTextureBottomLeft  = bottomLeft  = _rawMap[_blockTextures + nodes.bottomLeft ] & TEXTURE.TO_ID_VALUE;
-            _lastTextureBottom      = bottom      = _rawMap[_blockTextures + nodes.bottom     ] & TEXTURE.TO_ID_VALUE;
+            _lastTextureTopLeft = topLeft = _rawMap[_blockTextures + nodes.topLeft] & TEXTURE.TO_ID_VALUE;
+            _lastTextureTop = top = _rawMap[_blockTextures + nodes.top] & TEXTURE.TO_ID_VALUE;
+            _lastTextureTopRight = topRight = _rawMap[_blockTextures + nodes.topRight] & TEXTURE.TO_ID_VALUE;
+            _lastTextureBottomLeft = bottomLeft = _rawMap[_blockTextures + nodes.bottomLeft] & TEXTURE.TO_ID_VALUE;
+            _lastTextureBottom = bottom = _rawMap[_blockTextures + nodes.bottom] & TEXTURE.TO_ID_VALUE;
             _lastTextureBottomRight = bottomRight = _rawMap[_blockTextures + nodes.bottomRight] & TEXTURE.TO_ID_VALUE;
         }
 
@@ -942,9 +1002,9 @@ var Map = function(width, height) {
             && (bottomLeft === texture)
             && (bottom === texture)
             && (bottomRight === texture);
-    };
+    }
 
-    var isEachTextureWithAnyOfFlags = function(index, flags) {
+    function isEachTextureWithAnyOfFlags(index, flags) {
         var nodes,
             topLeft,
             top,
@@ -953,7 +1013,7 @@ var Map = function(width, height) {
             bottom,
             bottomRight;
 
-        if(_lastTextureIndex === index) {
+        if (_lastTextureIndex === index) {
             topLeft = _lastTextureTopLeft;
             top = _lastTextureTop;
             topRight = _lastTextureTopRight;
@@ -963,23 +1023,23 @@ var Map = function(width, height) {
         } else {
             nodes = getTextureNodesByIndex(index);
             _lastTextureIndex = index;
-            _lastTextureTopLeft     = topLeft     = _rawMap[_blockTextures + nodes.topLeft    ] & TEXTURE.TO_ID_VALUE;
-            _lastTextureTop         = top         = _rawMap[_blockTextures + nodes.top        ] & TEXTURE.TO_ID_VALUE;
-            _lastTextureTopRight    = topRight    = _rawMap[_blockTextures + nodes.topRight   ] & TEXTURE.TO_ID_VALUE;
-            _lastTextureBottomLeft  = bottomLeft  = _rawMap[_blockTextures + nodes.bottomLeft ] & TEXTURE.TO_ID_VALUE;
-            _lastTextureBottom      = bottom      = _rawMap[_blockTextures + nodes.bottom     ] & TEXTURE.TO_ID_VALUE;
+            _lastTextureTopLeft = topLeft = _rawMap[_blockTextures + nodes.topLeft] & TEXTURE.TO_ID_VALUE;
+            _lastTextureTop = top = _rawMap[_blockTextures + nodes.top] & TEXTURE.TO_ID_VALUE;
+            _lastTextureTopRight = topRight = _rawMap[_blockTextures + nodes.topRight] & TEXTURE.TO_ID_VALUE;
+            _lastTextureBottomLeft = bottomLeft = _rawMap[_blockTextures + nodes.bottomLeft] & TEXTURE.TO_ID_VALUE;
+            _lastTextureBottom = bottom = _rawMap[_blockTextures + nodes.bottom] & TEXTURE.TO_ID_VALUE;
             _lastTextureBottomRight = bottomRight = _rawMap[_blockTextures + nodes.bottomRight] & TEXTURE.TO_ID_VALUE;
         }
 
-        return !!(TEXTURE_INFO[topLeft    ].FLAG & flags)
-            && !!(TEXTURE_INFO[top        ].FLAG & flags)
-            && !!(TEXTURE_INFO[topRight   ].FLAG & flags)
-            && !!(TEXTURE_INFO[bottomLeft ].FLAG & flags)
-            && !!(TEXTURE_INFO[bottom     ].FLAG & flags)
+        return !!(TEXTURE_INFO[topLeft].FLAG & flags)
+            && !!(TEXTURE_INFO[top].FLAG & flags)
+            && !!(TEXTURE_INFO[topRight].FLAG & flags)
+            && !!(TEXTURE_INFO[bottomLeft].FLAG & flags)
+            && !!(TEXTURE_INFO[bottom].FLAG & flags)
             && !!(TEXTURE_INFO[bottomRight].FLAG & flags);
-    };
+    }
 
-    var isMixedTextureWithAllOfFlags = function(index, flags) {
+    function isMixedTextureWithAllOfFlags(index, flags) {
         var nodes,
             topLeft,
             top,
@@ -988,7 +1048,7 @@ var Map = function(width, height) {
             bottom,
             bottomRight;
 
-        if(_lastTextureIndex === index) {
+        if (_lastTextureIndex === index) {
             topLeft = _lastTextureTopLeft;
             top = _lastTextureTop;
             topRight = _lastTextureTopRight;
@@ -998,51 +1058,57 @@ var Map = function(width, height) {
         } else {
             nodes = getTextureNodesByIndex(index);
             _lastTextureIndex = index;
-            _lastTextureTopLeft     = topLeft     = _rawMap[_blockTextures + nodes.topLeft    ] & TEXTURE.TO_ID_VALUE;
-            _lastTextureTop         = top         = _rawMap[_blockTextures + nodes.top        ] & TEXTURE.TO_ID_VALUE;
-            _lastTextureTopRight    = topRight    = _rawMap[_blockTextures + nodes.topRight   ] & TEXTURE.TO_ID_VALUE;
-            _lastTextureBottomLeft  = bottomLeft  = _rawMap[_blockTextures + nodes.bottomLeft ] & TEXTURE.TO_ID_VALUE;
-            _lastTextureBottom      = bottom      = _rawMap[_blockTextures + nodes.bottom     ] & TEXTURE.TO_ID_VALUE;
+            _lastTextureTopLeft = topLeft = _rawMap[_blockTextures + nodes.topLeft] & TEXTURE.TO_ID_VALUE;
+            _lastTextureTop = top = _rawMap[_blockTextures + nodes.top] & TEXTURE.TO_ID_VALUE;
+            _lastTextureTopRight = topRight = _rawMap[_blockTextures + nodes.topRight] & TEXTURE.TO_ID_VALUE;
+            _lastTextureBottomLeft = bottomLeft = _rawMap[_blockTextures + nodes.bottomLeft] & TEXTURE.TO_ID_VALUE;
+            _lastTextureBottom = bottom = _rawMap[_blockTextures + nodes.bottom] & TEXTURE.TO_ID_VALUE;
             _lastTextureBottomRight = bottomRight = _rawMap[_blockTextures + nodes.bottomRight] & TEXTURE.TO_ID_VALUE;
         }
 
-        return ((TEXTURE_INFO[topLeft    ].FLAG
-            | TEXTURE_INFO[top        ].FLAG
-            | TEXTURE_INFO[topRight   ].FLAG
-            | TEXTURE_INFO[bottomLeft ].FLAG
-            | TEXTURE_INFO[bottom     ].FLAG
+        return ((TEXTURE_INFO[topLeft].FLAG
+            | TEXTURE_INFO[top].FLAG
+            | TEXTURE_INFO[topRight].FLAG
+            | TEXTURE_INFO[bottomLeft].FLAG
+            | TEXTURE_INFO[bottom].FLAG
             | TEXTURE_INFO[bottomRight].FLAG) & flags) === flags;
-    };
+    }
 
     // will replace a texture if any of it's flags matches with the flags
-    var replaceTextureAnyOfFlags = function(index, texture, flags) {
+    function replaceTextureAnyOfFlags(index, texture, flags) {
         var nodes;
         // sanitize
         texture = Math.abs(~~texture);
         // is this a known texture?
-        if(TEXTURE_INFO[texture]) {
+        if (TEXTURE_INFO[texture]) {
             nodes = getTextureNodesByIndex(index);
-            if(TEXTURE_INFO[_rawMap[_blockTextures + nodes.bottomLeft] & TEXTURE.TO_ID_VALUE].FLAG & flags)
+            if (TEXTURE_INFO[_rawMap[_blockTextures + nodes.bottomLeft] & TEXTURE.TO_ID_VALUE].FLAG & flags) {
                 _rawMap[_blockTextures + nodes.bottomLeft] = texture;
-            if(TEXTURE_INFO[_rawMap[_blockTextures + nodes.bottom] & TEXTURE.TO_ID_VALUE].FLAG & flags)
+            }
+            if (TEXTURE_INFO[_rawMap[_blockTextures + nodes.bottom] & TEXTURE.TO_ID_VALUE].FLAG & flags) {
                 _rawMap[_blockTextures + nodes.bottom] = texture;
-            if(TEXTURE_INFO[_rawMap[_blockTextures + nodes.bottomRight] & TEXTURE.TO_ID_VALUE].FLAG & flags)
+            }
+            if (TEXTURE_INFO[_rawMap[_blockTextures + nodes.bottomRight] & TEXTURE.TO_ID_VALUE].FLAG & flags) {
                 _rawMap[_blockTextures + nodes.bottomRight] = texture;
-            if(TEXTURE_INFO[_rawMap[_blockTextures + nodes.topLeft] & TEXTURE.TO_ID_VALUE].FLAG & flags)
+            }
+            if (TEXTURE_INFO[_rawMap[_blockTextures + nodes.topLeft] & TEXTURE.TO_ID_VALUE].FLAG & flags) {
                 _rawMap[_blockTextures + nodes.topLeft] = texture;
-            if(TEXTURE_INFO[_rawMap[_blockTextures + nodes.top] & TEXTURE.TO_ID_VALUE].FLAG & flags)
+            }
+            if (TEXTURE_INFO[_rawMap[_blockTextures + nodes.top] & TEXTURE.TO_ID_VALUE].FLAG & flags) {
                 _rawMap[_blockTextures + nodes.top] = texture;
-            if(TEXTURE_INFO[_rawMap[_blockTextures + nodes.topRight] & TEXTURE.TO_ID_VALUE].FLAG & flags)
+            }
+            if (TEXTURE_INFO[_rawMap[_blockTextures + nodes.topRight] & TEXTURE.TO_ID_VALUE].FLAG & flags) {
                 _rawMap[_blockTextures + nodes.topRight] = texture;
+            }
         }
-    };
+    }
 
-    var setTexture = function(index, texture) {
+    function setTexture(index, texture) {
         var nodes;
         // sanitize
         texture = Math.abs(~~texture);
         // is this a known texture?
-        if(TEXTURE_INFO[texture]) {
+        if (TEXTURE_INFO[texture]) {
             nodes = getTextureNodesByIndex(index);
             _rawMap[_blockTextures + nodes.bottomLeft] = texture;
             _rawMap[_blockTextures + nodes.bottom] = texture;
@@ -1051,7 +1117,7 @@ var Map = function(width, height) {
             _rawMap[_blockTextures + nodes.top] = texture;
             _rawMap[_blockTextures + nodes.topRight] = texture;
         }
-    };
+    }
 
     return {
         calculateAreaMap: calculateAreaMap,
@@ -1077,4 +1143,4 @@ var Map = function(width, height) {
     };
 }
 
-module.exports = Map;
+module.exports = S2Map;

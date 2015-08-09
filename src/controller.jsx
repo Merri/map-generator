@@ -66,16 +66,16 @@ var App = React.createClass({
     componentWillMount: function() {
         var hasLocalStorage = false;
 
-        if(this.state.meetsRequirements) {
+        if (this.state.meetsRequirements) {
             // if localStorage / cookies are disabled then accessing localStorage will throw an error
             try {
                 hasLocalStorage = !!localStorage;
             } catch(err) {}
 
-            if(hasLocalStorage) {
-                if(localStorage.width)
+            if (hasLocalStorage) {
+                if (localStorage.width)
                     this.state.seedOptions.width = ~~localStorage.width;
-                if(localStorage.height)
+                if (localStorage.height)
                     this.state.seedOptions.height = ~~localStorage.height;
             }
 
@@ -132,7 +132,7 @@ var App = React.createClass({
             (this.state.seedOptions.width + this.state.seedOptions.height) * 0.0002 + 0.4
         ];
         
-        if(this.state.hasLocalStorage) {
+        if (this.state.hasLocalStorage) {
             localStorage.width = this.state.seedOptions.width;
             localStorage.height = this.state.seedOptions.height;
         }
@@ -227,7 +227,7 @@ var App = React.createClass({
 
     handleBaseLevel: function(value) {
         value = ~~value;
-        if(this.state.heightOptions.baseLevel !== value) {
+        if (this.state.heightOptions.baseLevel !== value) {
             this.state.heightOptions.baseLevel = value;
             this.handleLandscape();
         }
@@ -235,7 +235,7 @@ var App = React.createClass({
 
     handleGroundLevel: function(value) {
         value = ~~value;
-        if(this.state.heightOptions.groundLevel !== value) {
+        if (this.state.heightOptions.groundLevel !== value) {
             this.state.heightOptions.groundLevel = value;
             this.handleLandscape();
         }
@@ -243,7 +243,7 @@ var App = React.createClass({
 
     handleFlatten: function(value) {
         value = ~~value;
-        if(this.state.heightOptions.flatten !== value) {
+        if (this.state.heightOptions.flatten !== value) {
             this.state.heightOptions.flatten = value;
             this.handleLandscape();
         }
@@ -251,7 +251,7 @@ var App = React.createClass({
 
     handleNoise: function(value) {
         value = ~~value ? (~~value) / 10 : 0;
-        if(this.state.heightOptions.randomize !== value) {
+        if (this.state.heightOptions.randomize !== value) {
             this.state.heightOptions.randomize = value;
             this.handleLandscape();
         }
@@ -271,7 +271,7 @@ var App = React.createClass({
     handleViewTypeChange: function(event) {
         var value = event.target.value;
 
-        if(value === ''+~~value)
+        if (value === ''+~~value)
             value = ~~value;
         
         this.setState({
@@ -320,7 +320,7 @@ var App = React.createClass({
     },
 
     render: function() {
-        if(!this.state.meetsRequirements) {
+        if (!this.state.meetsRequirements) {
             return <Unsupported />;
         }
 
@@ -336,7 +336,7 @@ var App = React.createClass({
                         top: player.y + 'px',
                     };
 
-                if(index > 6) {
+                if (index > 6) {
                     className += ' ' + className + '--rttr';
                 }
 
@@ -346,9 +346,9 @@ var App = React.createClass({
             }),
             totalAreas = generator.getAreas() || [],
             areas = totalAreas.reduce(function(prevValue, curValue, index, array) {
-                if(curValue.type === 1) {
+                if (curValue.type === 1) {
                     prevValue.land++;
-                } else if(curValue.type === 2) {
+                } else if (curValue.type === 2) {
                     prevValue.water++;
                 }
                 return prevValue;

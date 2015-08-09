@@ -1,13 +1,12 @@
 'use strict';
 
 var Promise = require('promise'),
-    Map = require('./map');
+    S2Map = require('./map');
 
-var constants = require('./constants'),
-    AREA = constants.AREA,
-    CP437 = constants.CP437,
+var constants = require('./constants');
+
+var CP437 = constants.CP437,
     COLOR = constants.COLOR,
-    OBJECT_TYPE = constants.OBJECT_TYPE,
     RESOURCE = constants.RESOURCE,
     SITE = constants.SITE,
     TERRAIN = constants.TERRAIN,
@@ -17,12 +16,6 @@ var constants = require('./constants'),
 
 var Generator = function() {
     var map,
-        x,
-        y,
-        i,
-        j,
-        k,
-        l,
         areas,
         around,
         aroundExpandTo,
@@ -33,7 +26,6 @@ var Generator = function() {
         data,
         deletedNodes,
         height,
-        index,
         mass,
         massRatio,
         nodes,
@@ -42,7 +34,6 @@ var Generator = function() {
         seedMap,
         startingPoints,
         total,
-        value,
         viewType,
         width;
 
@@ -50,7 +41,7 @@ var Generator = function() {
         aroundExpandTo = map.getNodesByIndex(index);
 
         seedMap[index] = value;
-        if(current !== void 0) {
+        if (current != null) {
             delete nodes[current];
             deletedNodes.push(current);
         }
@@ -58,9 +49,9 @@ var Generator = function() {
 
         Object.keys(aroundExpandTo).forEach(function(key) {
             index = aroundExpandTo[key];
-            if(seedMap[index] === 0) {
+            if (seedMap[index] === 0) {
                 seedMap[index] = 1;
-                if(deletedNodes.length) {
+                if (deletedNodes.length) {
                     nodes[deletedNodes.pop()] = index
                 } else {
                     nodes.push(index);
@@ -70,27 +61,42 @@ var Generator = function() {
     }
 
     var seed = function(options) {
-        //if(!options || !options.length) options = {};
+        var index,
+            value
+
+        var x, y
+
+        // if (!options || !options.length) options = {};
         var likelyhood = options.likelyhood,
             givenStartingPoints = ~~options.startingPoints,
             givenMassRatio = ~~options.massRatio
 
-        //width = 1024 || (~~(Math.random() * 20) + 7) * 16,
-        //height = 1024 || (~~(Math.random() * 20) + 7) * 16,
+        // width = 1024 || (~~(Math.random() * 20) + 7) * 16,
+        // height = 1024 || (~~(Math.random() * 20) + 7) * 16,
         width = ~~options.width;
         height = ~~options.height;
         size = width * height;
         borderProtection = ~~options.borderProtection;
-        if(borderProtection) borderProtection = ~~(Math.min(width, height) / borderProtection);
+        if (borderProtection) {
+            borderProtection = ~~(Math.min(width, height) / borderProtection);
+        }
         seedMap = new Uint8Array(size);
 
         // sanitize user input
-        if(givenStartingPoints < 1) givenStartingPoints = 1;
-        else if(givenStartingPoints > 512) givenStartingPoints = 512;
-        if(givenStartingPoints > size >> 2) givenStartingPoints = size >> 2;
-        
-        if(givenMassRatio < 1) givenMassRatio = 1;
-        else if(givenMassRatio > 99) givenMassRatio = 99;
+        if (givenStartingPoints < 1) {
+            givenStartingPoints = 1;
+        } else if (givenStartingPoints > 512) {
+            givenStartingPoints = 512;
+        }
+        if (givenStartingPoints > size >> 2) {
+            givenStartingPoints = size >> 2;
+        }
+
+        if (givenMassRatio < 1) {
+            givenMassRatio = 1;
+        } else if (givenMassRatio > 99) {
+            givenMassRatio = 99;
+        }
 
         nodes = [];
         deletedNodes = [];
@@ -98,17 +104,17 @@ var Generator = function() {
         massRatio = ~~(size / 100 * givenMassRatio);
         startingPoints = 0;
 
-        map = new Map(width, height);
+        map = new S2Map(width, height);
         data = map.getRawData();
 
         // randomize some starting points
         value = 255;
-        while(startingPoints < givenStartingPoints) {
+        while (startingPoints < givenStartingPoints) {
             x = ~~(Math.random() * (width - borderProtection * 2)) + borderProtection;
             y = ~~(Math.random() * (height - borderProtection * 2)) + borderProtection;
             index = y * width + x;
 
-            if(seedMap[index] === 0) {
+            if (seedMap[index] === 0) {
                 expandTo(index, value);
                 startingPoints++;
             }
@@ -118,10 +124,9 @@ var Generator = function() {
         index = y * width + x;
         var direction = ~~(Math.random() * 6),
             around;
-        while(startingPoints < givenStartingPoints) {
-            
+        while (startingPoints < givenStartingPoints) {
             around = map.getNodesByIndex(index);
-            switch(direction) {
+            switch (direction) {
                 case 1:
                     index = around.topLeft;
                     break;
@@ -144,10 +149,10 @@ var Generator = function() {
             x = index % width;
             y = ~~((index - x) / width);
 
-            if(x >= borderProtection && x < (width - borderProtection)
+            if (x >= borderProtection && x < (width - borderProtection)
                 && y >= borderProtection && y < (height - borderProtection)) {
-                if(Math.random() < 0.15 && seedMap[index] === 0) {
-                    if((startingPoints & 7) === 0) {
+                if (Math.random() < 0.15 && seedMap[index] === 0) {
+                    if ((startingPoints & 7) === 0) {
                         direction = (6 + (direction + ~~(Math.random() * 3) - 1)) % 6;
                     }
                     expandTo(index, value);
@@ -158,25 +163,27 @@ var Generator = function() {
 
         var expander = 7;
 
+        var i
+
         // do the land expansion
-        if(mass > 0) {
-            while(mass < massRatio) {
+        if (mass > 0) {
+            while (mass < massRatio) {
                 value--;
-                for(i = nodes.length; i > 0; --i) {
+                for (i = nodes.length; i > 0; --i) {
                     index = nodes[i];
-                    if(index !== void 0) {
+                    if (index != null) {
                         total = 0;
                         around = map.getNodesByIndex(index);
 
-                        if(seedMap[around.left] > 1) total++;
-                        if(seedMap[around.right] > 1) total++;
-                        if(seedMap[around.topLeft] > 1) total++;
-                        if(seedMap[around.topRight] > 1) total++;
-                        if(seedMap[around.bottomLeft] > 1) total++;
-                        if(seedMap[around.bottomRight] > 1) total++;
+                        total += (seedMap[around.left] > 1)
+                            + (seedMap[around.right] > 1)
+                            + (seedMap[around.topLeft] > 1)
+                            + (seedMap[around.topRight] > 1)
+                            + (seedMap[around.bottomLeft] > 1)
+                            + (seedMap[around.bottomRight] > 1)
 
-                        if(Math.random() <= likelyhood[total]) {
-                            if(expander > 0) {
+                        if (Math.random() <= likelyhood[total]) {
+                            if (expander > 0) {
                                 expandTo(index, ~~(value / expander * total) + 2, i);
                             } else {
                                 expandTo(index, ~~(value * (1 + -expander / 20) * total) + 2, i);
@@ -184,7 +191,7 @@ var Generator = function() {
                         }
                     }
                 }
-                if(value === 2) {
+                if (value === 2) {
                     expander--;
                     value = 3;
                 }
@@ -192,41 +199,49 @@ var Generator = function() {
         }
     };
 
-    //options: baseLevel
+    // options: baseLevel
     var createHeight = function(options) {
-        //if(!options || !options.length) options = {};
+        // if (!options || !options.length) options = {};
         baseLevel = options.baseLevel = ~~options.baseLevel;
         options.groundLevel = Math.abs(~~options.groundLevel);
         options.flatten = Math.abs(options.flatten);
         options.noiseOnWater = !!options.noiseOnWater;
 
-        if(options.groundLevel > 5) options.groundLevel = 5;
-        if(options.flatten < 1) options.flatten = 1;
-        else if(options.flatten > 100) options.flatten = 100;
+        if (options.groundLevel > 5) {
+            options.groundLevel = 5;
+        }
+        if (options.flatten < 1) {
+            options.flatten = 1;
+        } else if (options.flatten > 100) {
+            options.flatten = 100;
+        }
 
         map.initializeHeight(options.baseLevel);
 
+        var x, y
         // push land up or down before we start!
-        i = options.baseLevel <= 30 ? options.groundLevel : -options.groundLevel;
-        index = 0;
-        for(y = 0; y < height; y++) {
-            for(x = 0; x < width; x++) {
-                if(seedMap[index] > 1) {
+        var i = options.baseLevel <= 30 ? options.groundLevel : -options.groundLevel;
+        var index = 0;
+        for (y = 0; y < height; y++) {
+            for (x = 0; x < width; x++) {
+                if (seedMap[index] > 1) {
                     map.changeHeight(x, y, 0, i);
                 }
                 index++;
             }
         }
 
+        var j, k
+        var value
         // draw the final height map based on what we have
         index = 0;
-        for(y = 0; y < height; y++) {
-            for(x = 0; x < width; x++) {
+        for (y = 0; y < height; y++) {
+            for (x = 0; x < width; x++) {
                 value = seedMap[index];
-                if(value > 1) {
+                if (value > 1) {
                     around = map.getRadiusNodes(x, y, 5);
-                    for(k = j = i = 0; i < around.length; i++) {
-                        if(seedMap[around[i]] > 1) {
+                    for (k = j = i = 0; i < around.length; i++) {
+                        if (seedMap[around[i]] > 1) {
                             k += seedMap[around[i]];
                             j++;
                         } else {
@@ -241,21 +256,21 @@ var Generator = function() {
                     i5 = seedMap[around.bottomLeft];
                     i6 = seedMap[around.bottomRight];
                     i7 = (i1 > 1) + (i2 > 1) + (i3 > 1) + (i4 > 1) + (i5 > 1) + (i6 > 1);*/
-                    if(i > around.length - 6) {
+                    if (i > around.length - 6) {
                         // calculate avarage around node
-                        //i = Math.round((i1 + i2 + i3 + i4 + i5 + i6) / i7);
+                        // i = Math.round((i1 + i2 + i3 + i4 + i5 + i6) / i7);
                         i = Math.round(k / j);
                         // go up or down
                         // MOUNTAIN RANGES
-                        //map.changeHeight(x, y, ((value & 15) & (i & 15)) / 2, ~~((value - i) / 8));
+                        // map.changeHeight(x, y, ((value & 15) & (i & 15)) / 2, ~~((value - i) / 8));
                         // ROUGH
-                        //map.changeHeight(x, y, ((value & 15) | (i & 15)) / 4, ~~((value - i) / 6));
+                        // map.changeHeight(x, y, ((value & 15) | (i & 15)) / 4, ~~((value - i) / 6));
                         // HILLS
-                        //map.changeHeight(x, y, ((value & 3) | (i & 3)) / 1.25, ~~((value - i + 3) / 7));
+                        // map.changeHeight(x, y, ((value & 3) | (i & 3)) / 1.25, ~~((value - i + 3) / 7));
                         // HUGE MOUNTAINS
-                        //map.changeHeight(x, y, (value - i) / 32, (value - i) > 0 ? (value & i & 81) + 1 : -((value & i & 5) - 1) / 2);
+                        // map.changeHeight(x, y, (value - i) / 32, (value - i) > 0 ? (value & i & 81) + 1 : -((value & i & 5) - 1) / 2);
                         // GIGANTIC MOUNTAINS
-                        //map.changeHeight(x, y, (value - i) / 24, (value - i) > 0 ? (value & i & 81) + 1 : -((value & i & 5) - 1) / 2);
+                        // map.changeHeight(x, y, (value - i) / 24, (value - i) > 0 ? (value & i & 81) + 1 : -((value & i & 5) - 1) / 2);
                         // OUT OF THIS WORLD MOUNTAINS
                         map.changeHeight(x, y, Math.min((value - i) / options.flatten, 1), (value - i) > 0 ? (value & i & 81) + 1 : -(value & i & 3) - 1);
                     }
@@ -265,12 +280,12 @@ var Generator = function() {
         }
 
         // some extra randomize
-        if(options.randomize > 0) {
-            if(!options.noiseOnWater) {
+        if (options.randomize > 0) {
+            if (!options.noiseOnWater) {
                 index = 0;
-                for(y = 0; y < height; y++) {
-                    for(x = 0; x < width; x++) {
-                        if(seedMap[index] > 1 || data[index] !== baseLevel) {
+                for (y = 0; y < height; y++) {
+                    for (x = 0; x < width; x++) {
+                        if (seedMap[index] > 1 || data[index] !== baseLevel) {
                             map.changeHeight(x, y, 0, ~~(Math.random() * ((options.randomize * 2) + 1) - options.randomize));
                         }
                         index++;
@@ -278,8 +293,8 @@ var Generator = function() {
                 }
             } else {
                 index = 0;
-                for(y = 0; y < height; y++) {
-                    for(x = 0; x < width; x++) {
+                for (y = 0; y < height; y++) {
+                    for (x = 0; x < width; x++) {
                         map.changeHeight(x, y, 0, ~~(Math.random() * ((options.randomize * 2) + 1) - options.randomize));
                         index++;
                     }
@@ -291,8 +306,7 @@ var Generator = function() {
     };
 
     var createBaseTextures = function(options) {
-        var changed = false,
-            i,
+        var i,
             j,
             heightTotal = new Uint32Array(60),
             smallestHeight = 60,
@@ -312,40 +326,45 @@ var Generator = function() {
         map.initializeTexture(options.texture);
 
         // find out where we have the most mass
-        for(i = 0; i < size; i++) {
+        for (i = 0; i < size; i++) {
             heightTotal[data[i]]++;
-            if(smallestHeight > data[i]) smallestHeight = data[i];
-            if(biggestHeight < data[i]) biggestHeight = data[i];
+            if (smallestHeight > data[i]) {
+                smallestHeight = data[i];
+            }
+            if (biggestHeight < data[i]) {
+                biggestHeight = data[i];
+            }
         }
 
         // draw water texture
-        for(i = 0; i < size; i++) {
+        for (i = 0; i < size; i++) {
             j = seedMap[i] & 3;
-            if(data[i] >= (baseLevel - 2) && data[i] <= (baseLevel + 2)) {
-                if(seedMap[i] < 2) {
+            if (data[i] >= (baseLevel - 2) && data[i] <= (baseLevel + 2)) {
+                if (seedMap[i] < 2) {
                     map.setTexture(i, options.waterTexture);
-                } else if(j > 1) {
+                } else if (j > 1) {
                     // Meadow / Pasture / Tundra
                     map.setTexture(i, 0x07 + (seedMap[i] & 3));
-                } else if(j === 0) {
+                } else if (j === 0) {
                     // Flower variant
                     map.setTexture(i, 0x0F);
                 }
-            }// else if(/*j === 0 &&*/ smallestHeight > data[i] - 2) {
+            }
+            // else if (/*j === 0 &&*/ smallestHeight > data[i] - 2) {
             //    // Swamp
             //    map.setTexture(i, 0x03);
-            //}
+            // }
         }
 
         map.initializeObjects();
         map.calculateSiteMap();
 
         // draw mountain texture
-        if(options.mountainGenerate === 7) {
-            for(i = 0; i < size; i++) {
-                if(!map.isAnyTextureWithAnyOfFlags(i, TEXTURE.ARID | TEXTURE.IMPASSABLE)) {
+        if (options.mountainGenerate === 7) {
+            for (i = 0; i < size; i++) {
+                if (!map.isAnyTextureWithAnyOfFlags(i, TEXTURE.ARID | TEXTURE.IMPASSABLE)) {
                     siteNodes = map.getNodesByIndex(i);
-                    if(
+                    if (
                         (data[siteBlock + siteNodes.left] & 0xF7) === 0x01
                         && (data[siteBlock + siteNodes.right] & 0xF7) === 0x01
                         && (data[siteBlock + siteNodes.topLeft] & 0xF7) === 0x01
@@ -357,11 +376,11 @@ var Generator = function() {
                     }
                 }
             }
-        } else if(options.mountainGenerate === 6) {
-            for(i = 0; i < size; i++) {
-                if((data[siteBlock + i] & 0xF7) === 0x01 && !map.isAnyTextureWithAnyOfFlags(i, TEXTURE.ARID | TEXTURE.IMPASSABLE)) {
+        } else if (options.mountainGenerate === 6) {
+            for (i = 0; i < size; i++) {
+                if ((data[siteBlock + i] & 0xF7) === 0x01 && !map.isAnyTextureWithAnyOfFlags(i, TEXTURE.ARID | TEXTURE.IMPASSABLE)) {
                     siteNodes = map.getNodesByIndex(i);
-                    if(
+                    if (
                         (data[siteBlock + siteNodes.left] & 0xF7) === 0x01
                         && (data[siteBlock + siteNodes.right] & 0xF7) === 0x01
                         && (data[siteBlock + siteNodes.topLeft] & 0xF7) === 0x01
@@ -374,10 +393,10 @@ var Generator = function() {
                 }
             }
         } else {
-            for(i = 0; i < size; i++) {
-                if((data[siteBlock + i] & 0xF7) === 0x01 && !map.isAnyTextureWithAnyOfFlags(i, TEXTURE.ARID | TEXTURE.IMPASSABLE)) {
+            for (i = 0; i < size; i++) {
+                if ((data[siteBlock + i] & 0xF7) === 0x01 && !map.isAnyTextureWithAnyOfFlags(i, TEXTURE.ARID | TEXTURE.IMPASSABLE)) {
                     siteNodes = map.getNodesByIndex(i);
-                    if(
+                    if (
                         options.mountainGenerate <= (((data[siteBlock + siteNodes.left] & 0xF7) === 0x01)
                         + ((data[siteBlock + siteNodes.right] & 0xF7) === 0x01)
                         + ((data[siteBlock + siteNodes.topLeft] & 0xF7) === 0x01)
@@ -392,169 +411,198 @@ var Generator = function() {
         }
 
         // seamless mode
-        if(!options.seamless) {
-            for(i = 0; i < width; i++) {
-                switch(data[textureBlock1 + i]) {
+        if (!options.seamless) {
+            for (i = 0; i < width; i++) {
+                switch (data[textureBlock1 + i]) {
                 // savannah and steppe
                 case 0x00:
                 case 0x0E:
-                    map.setTexture(i, 0x03); // swamp
+                    // swamp
+                    map.setTexture(i, 0x03);
                     break;
                 // meadow
                 case 0x08:
                 case 0x09:
                 case 0x0A:
                 case 0x0F:
-                    map.setTexture(i, 0x03); // swamp
+                    // swamp
+                    map.setTexture(i, 0x03);
                     break;
                 // desert
                 case 0x04:
                 case 0x07:
-                    map.setTexture(i, 0x02); // snow
+                    // snow
+                    map.setTexture(i, 0x02);
                     break;
                 // magenta
                 case 0x11:
-                    map.setTexture(i, 0x10); // lava
+                    // lava
+                    map.setTexture(i, 0x10);
                     break;
                 // mountain meadow
                 case 0x12:
                 case 0x22:
-                    map.setTexture(i, 0x10); // lava
+                    // lava
+                    map.setTexture(i, 0x10);
                     break;
                 // mountain
                 case 0x01:
                 case 0x0B:
                 case 0x0C:
                 case 0x0D:
-                    map.setTexture(i, 0x02); // snow
+                    // snow
+                    map.setTexture(i, 0x02);
                     break;
                 // water
                 case 0x05:
                 case 0x06:
-                    map.setTexture(i, 0x13); // water (no ships)
+                    // water (no ships)
+                    map.setTexture(i, 0x13);
                     break;
                 default:
-                    switch(data[textureBlock2 + i]) {
+                    switch (data[textureBlock2 + i]) {
                     // savannah and steppe
                     case 0x00:
                     case 0x0E:
-                        map.setTexture(i, 0x03); // swamp
+                        // swamp
+                        map.setTexture(i, 0x03);
                         break;
                     // meadow
                     case 0x08:
                     case 0x09:
                     case 0x0A:
                     case 0x0F:
-                        map.setTexture(i, 0x03); // swamp
+                        // swamp
+                        map.setTexture(i, 0x03);
                         break;
                     // desert
                     case 0x04:
                     case 0x07:
-                        map.setTexture(i, 0x02); // snow
+                        // snow
+                        map.setTexture(i, 0x02);
                         break;
                     // magenta
                     case 0x11:
-                        map.setTexture(i, 0x10); // lava
+                        // lava
+                        map.setTexture(i, 0x10);
                         break;
                     // mountain meadow
                     case 0x12:
                     case 0x22:
-                        map.setTexture(i, 0x10); // lava
+                        // lava
+                        map.setTexture(i, 0x10);
                         break;
                     // mountain
                     case 0x01:
                     case 0x0B:
                     case 0x0C:
                     case 0x0D:
-                        map.setTexture(i, 0x02); // snow
+                        // snow
+                        map.setTexture(i, 0x02);
                         break;
                     // water
                     case 0x05:
                     case 0x06:
-                        map.setTexture(i, 0x13); // water (no ships)
+                        // water (no ships)
+                        map.setTexture(i, 0x13);
                         break;
+                    default:
                     }
                 }
             }
-            for(; i < size; i += width) {
-                switch(data[textureBlock1 + i]) {
+            for (; i < size; i += width) {
+                switch (data[textureBlock1 + i]) {
                 // savannah and steppe
                 case 0x00:
                 case 0x0E:
-                    map.setTexture(i, 0x03); // swamp
+                    // swamp
+                    map.setTexture(i, 0x03);
                     break;
                 // meadow
                 case 0x08:
                 case 0x09:
                 case 0x0A:
                 case 0x0F:
-                    map.setTexture(i, 0x03); // swamp
+                    // swamp
+                    map.setTexture(i, 0x03);
                     break;
                 // desert
                 case 0x04:
                 case 0x07:
-                    map.setTexture(i, 0x02); // snow
+                    // snow
+                    map.setTexture(i, 0x02);
                     break;
                 // magenta
                 case 0x11:
-                    map.setTexture(i, 0x10); // lava
+                    // lava
+                    map.setTexture(i, 0x10);
                     break;
                 // mountain meadow
                 case 0x12:
                 case 0x22:
-                    map.setTexture(i, 0x10); // lava
+                    // lava
+                    map.setTexture(i, 0x10);
                     break;
                 // mountain
                 case 0x01:
                 case 0x0B:
                 case 0x0C:
                 case 0x0D:
-                    map.setTexture(i, 0x02); // snow
+                    // snow
+                    map.setTexture(i, 0x02);
                     break;
                 // water
                 case 0x05:
                 case 0x06:
-                    map.setTexture(i, 0x13); // water (no ships)
+                    // water (no ships)
+                    map.setTexture(i, 0x13);
                     break;
                 default:
-                    switch(data[textureBlock2 + i]) {
+                    switch (data[textureBlock2 + i]) {
                     // savannah and steppe
                     case 0x00:
                     case 0x0E:
-                        map.setTexture(i, 0x03); // swamp
+                        // swamp
+                        map.setTexture(i, 0x03);
                         break;
                     // meadow
                     case 0x08:
                     case 0x09:
                     case 0x0A:
                     case 0x0F:
-                        map.setTexture(i, 0x03); // swamp
+                        // swamp
+                        map.setTexture(i, 0x03);
                         break;
                     // desert
                     case 0x04:
                     case 0x07:
-                        map.setTexture(i, 0x02); // snow
+                        // snow
+                        map.setTexture(i, 0x02);
                         break;
                     // magenta
                     case 0x11:
-                        map.setTexture(i, 0x10); // lava
+                        // lava
+                        map.setTexture(i, 0x10);
                         break;
                     // mountain meadow
                     case 0x12:
                     case 0x22:
-                        map.setTexture(i, 0x10); // lava
+                        // lava
+                        map.setTexture(i, 0x10);
                         break;
                     // mountain
                     case 0x01:
                     case 0x0B:
                     case 0x0C:
                     case 0x0D:
-                        map.setTexture(i, 0x02); // snow
+                        // snow
+                        map.setTexture(i, 0x02);
                         break;
                     // water
                     case 0x05:
                     case 0x06:
-                        map.setTexture(i, 0x13); // water (no ships)
+                        // water (no ships)
+                        map.setTexture(i, 0x13);
                         break;
                     default:
                     }
@@ -563,50 +611,50 @@ var Generator = function() {
         }
 
         // post processing
-        for(i = 0; i < size; i++) {
-            if(map.isAnyTextureWithAnyOfFlags(i, TEXTURE.ROCK)) {
+        for (i = 0; i < size; i++) {
+            if (map.isAnyTextureWithAnyOfFlags(i, TEXTURE.ROCK)) {
                 map.replaceTextureAnyOfFlags(i, 0x12, TEXTURE.ARABLE);
-            } else if(map.isMixedTextureWithAllOfFlags(i, TEXTURE.WATER | TEXTURE.HABITABLE)) {
-                if(Math.random() < 0.5) {
+            } else if (map.isMixedTextureWithAllOfFlags(i, TEXTURE.WATER | TEXTURE.HABITABLE)) {
+                if (Math.random() < 0.5) {
                     map.replaceTextureAnyOfFlags(i, 0x04, TEXTURE.WATER | TEXTURE.HABITABLE);
                 }
-            } else if(map.isMixedTextureWithAllOfFlags(i, TEXTURE.WATER | TEXTURE.ROCK)) {
+            } else if (map.isMixedTextureWithAllOfFlags(i, TEXTURE.WATER | TEXTURE.ROCK)) {
                 map.replaceTextureAnyOfFlags(i, 0x12, TEXTURE.WATER | TEXTURE.ARID);
-            } else if(map.isMixedTextureWithAllOfFlags(i, TEXTURE.WATER | TEXTURE.MOUNT_MEADOW)) {
+            } else if (map.isMixedTextureWithAllOfFlags(i, TEXTURE.WATER | TEXTURE.MOUNT_MEADOW)) {
                 map.replaceTextureAnyOfFlags(i, 0x12, TEXTURE.WATER | TEXTURE.ARID | TEXTURE.HABITABLE);
             }
         }
 
-        for(i = 0; i < size; i++) {
-            if(map.isMixedTextureWithAllOfFlags(i, TEXTURE.ARID | TEXTURE.ARABLE)) {
-                if(Math.random() < 0.75) {
+        for (i = 0; i < size; i++) {
+            if (map.isMixedTextureWithAllOfFlags(i, TEXTURE.ARID | TEXTURE.ARABLE)) {
+                if (Math.random() < 0.75) {
                     map.replaceTextureAnyOfFlags(i, 0x0E, TEXTURE.ARABLE);
                 }
             }
         }
 
-        for(i = 0; i < size; i++) {
-            if(map.isMixedTextureWithAllOfFlags(i, TEXTURE.STEPPE | TEXTURE.ARABLE)) {
-                if(Math.random() < 0.75) {
+        for (i = 0; i < size; i++) {
+            if (map.isMixedTextureWithAllOfFlags(i, TEXTURE.STEPPE | TEXTURE.ARABLE)) {
+                if (Math.random() < 0.75) {
                     map.replaceTextureAnyOfFlags(i, 0x00, TEXTURE.MEADOW);
                 }
-            } else if(map.isMixedTextureWithAllOfFlags(i, TEXTURE.WATER | TEXTURE.ARID)) {
-                if(Math.random() < 0.15) {
+            } else if (map.isMixedTextureWithAllOfFlags(i, TEXTURE.WATER | TEXTURE.ARID)) {
+                if (Math.random() < 0.15) {
                     map.setTexture(i, 0x0E);
                 }
-            } else if(map.isMixedTextureWithAllOfFlags(i, TEXTURE.STEPPE | TEXTURE.ARID)) {
-                if(Math.random() < 0.5) {
+            } else if (map.isMixedTextureWithAllOfFlags(i, TEXTURE.STEPPE | TEXTURE.ARID)) {
+                if (Math.random() < 0.5) {
                     map.setTexture(i, 0x0E);
                 }
-            } else if(map.isEachTextureSame(i, 0x03)) {
-                if(Math.random() < 0.05) {
+            } else if (map.isEachTextureSame(i, 0x03)) {
+                if (Math.random() < 0.05) {
                     map.setTexture(i, 0x13);
                 }
             }
         }
 
         /*var radiusNodes = map.getRadiusNodes(0, 1, 2, true);
-        for(i = 0; i < 12; i++) {
+        for (i = 0; i < 12; i++) {
             map.setTexture(radiusNodes[i], 0x10);
         }*/
 
@@ -623,29 +671,29 @@ var Generator = function() {
 
         // sanitize
         maxPlayerCount = ~~maxPlayerCount;
-        if(maxPlayerCount < 0) maxPlayerCount = 0;
-        else if(maxPlayerCount > 10) maxPlayerCount = 10;
+        if (maxPlayerCount < 0) {
+            maxPlayerCount = 0;
+        } else if (maxPlayerCount > 10) {
+            maxPlayerCount = 10;
+        }
 
         radius = ~~radius;
 
         function generateRandomPlayers(sites) {
-            var index,
-                nodes,
-                x,
-                y;
+            var nodesNearPlayer
 
-            if(sites.length > 0 && players.length < maxPlayerCount) {
+            if (sites.length > 0 && players.length < maxPlayerCount) {
                 // randomize a position from given plausible sites
-                index = sites[~~(Math.random() * sites.length)];
-                x = index % width;
-                y = ~~((index - x) / width);
+                var index = sites[~~(Math.random() * sites.length)];
+                var x = index % width;
+                var y = ~~((index - x) / width);
 
                 // getRadiusNodes returns a typed array; must convert it to regular array
-                nodes = Array.apply([], map.getRadiusNodes(x, y, radius));
+                nodesNearPlayer = Array.apply([], map.getRadiusNodes(x, y, radius));
 
                 // remove nodes near newly randomized player
-                sites = sites.filter(function(index) {
-                    return nodes.indexOf(index) === -1;
+                sites = sites.filter(function(nearbyIndex) {
+                    return nodesNearPlayer.indexOf(nearbyIndex) === -1
                 });
 
                 // add player to list of known players
@@ -661,7 +709,9 @@ var Generator = function() {
         }
 
         // start the recursive call (if necessary)
-        if(maxPlayerCount > 0) generateRandomPlayers(map.getAllSitesOfType(SITE.CASTLE));
+        if (maxPlayerCount > 0) {
+            generateRandomPlayers(map.getAllSitesOfType(SITE.CASTLE));
+        }
 
         return players;
     };
@@ -674,7 +724,7 @@ var Generator = function() {
             eachTextureIsSameKind,
             usableLandmass = 0,
             newResource,
-            nodes,
+            nearbyNodes,
             resources = {
                 freshWater: 0,
                 mineCoal: 0,
@@ -685,10 +735,8 @@ var Generator = function() {
                 granite: 0,
                 tree: 0
             },
-            texture,
             textureFlag,
             textures,
-            textureBlocks = size,
             objectIndexBlock = size * 4,
             objectTypeBlock = size * 5,
             siteBlock = size * 8,
@@ -696,24 +744,32 @@ var Generator = function() {
             resourceBlock = size * 11;
 
         // clean up
-        for(i = 0; i < size; i++) {
+        for (i = 0; i < size; i++) {
             data[objectIndexBlock + i] = 0;
             data[objectTypeBlock + i] = 0;
         }
 
         options = options || {};
         // sanitize values
-        options.treeRatio = (options.treeRatio !== void 0) ? ~~options.treeRatio : 33;
-        if(options.treeRatio < 0) options.treeRatio = 0;
-        else if(options.treeRatio > 50) options.treeRatio = 0.5;
-        else options.treeRatio = options.treeRatio / 100;
+        options.treeRatio = (options.treeRatio != null) ? ~~options.treeRatio : 33;
+        if (options.treeRatio < 0) {
+            options.treeRatio = 0;
+        } else if (options.treeRatio > 50) {
+            options.treeRatio = 0.5;
+        } else {
+            options.treeRatio /= 100;
+        }
 
-        options.graniteRatio = (options.graniteRatio !== void 0) ? ~~options.graniteRatio : 15;
-        if(options.graniteRatio < 0) options.graniteRatio = 0;
-        else if(options.graniteRatio > 25) options.graniteRatio = 0.25;
-        else options.graniteRatio = options.graniteRatio / 100;
+        options.graniteRatio = (options.graniteRatio != null) ? ~~options.graniteRatio : 15;
+        if (options.graniteRatio < 0) {
+            options.graniteRatio = 0;
+        } else if (options.graniteRatio > 25) {
+            options.graniteRatio = 0.25;
+        } else {
+            options.graniteRatio /= 100;
+        }
 
-        for(i = 0; i < size; i++) {
+        for (i = 0; i < size; i++) {
             newResource = 0;
             textures = map.getTexturesByIndex(i);
             // we have to drop support flags so that ie. Mountain Meadow is comparable to the Habitable Mountain texture (essentially the same)
@@ -725,18 +781,18 @@ var Generator = function() {
                 && textureFlag === (TEXTURE_INFO[textures.bottom].FLAG & TEXTURE.DROP_SUPPORT)
                 && textureFlag === (TEXTURE_INFO[textures.bottomRight].FLAG & TEXTURE.DROP_SUPPORT)
             );
-            if(eachTextureIsSameKind) {
+            if (eachTextureIsSameKind) {
                 // water?
-                if(textures.topLeft === 0x05) {
-                    nodes = map.getNodesByIndex(i);
+                if (textures.topLeft === 0x05) {
+                    nearbyNodes = map.getNodesByIndex(i);
                     // can we find an accessible site around?
-                    if(
-                        (data[siteBlock + nodes.left] !== SITE.IMPASSABLE)
-                        || (data[siteBlock + nodes.right] !== SITE.IMPASSABLE)
-                        || (data[siteBlock + nodes.topLeft] !== SITE.IMPASSABLE)
-                        || (data[siteBlock + nodes.topRight] !== SITE.IMPASSABLE)
-                        || (data[siteBlock + nodes.bottomLeft] !== SITE.IMPASSABLE)
-                        || (data[siteBlock + nodes.bottomRight] !== SITE.IMPASSABLE)
+                    if (
+                        (data[siteBlock + nearbyNodes.left] !== SITE.IMPASSABLE)
+                        || (data[siteBlock + nearbyNodes.right] !== SITE.IMPASSABLE)
+                        || (data[siteBlock + nearbyNodes.topLeft] !== SITE.IMPASSABLE)
+                        || (data[siteBlock + nearbyNodes.topRight] !== SITE.IMPASSABLE)
+                        || (data[siteBlock + nearbyNodes.bottomLeft] !== SITE.IMPASSABLE)
+                        || (data[siteBlock + nearbyNodes.bottomRight] !== SITE.IMPASSABLE)
                     ) {
                         // fish!
                         newResource = RESOURCE.FISH;
@@ -745,7 +801,8 @@ var Generator = function() {
                 } else if (textureFlag & TEXTURE.ROCK) {
                     // add coal / iron ore / gold / granite
                     newResource = seedMap[i] & 0x3F;
-                    if(newResource < /*0x20*/0x2C) {
+                    // this had 0x20 at some point (think more about this)
+                    if (newResource < 0x2C) {
                         newResource = RESOURCE.COAL | (i & 0x07);
                         resources.mineCoal += (i & 0x07);
                     } else if (newResource < 0x30) {
@@ -759,7 +816,7 @@ var Generator = function() {
                         resources.mineGranite += (i & 0x07);
                     }
                 } else if (textureFlag & TEXTURE.HABITABLE) {
-                    if(textureFlag & TEXTURE.ARABLE) {
+                    if (textureFlag & TEXTURE.ARABLE) {
                         // fresh water!
                         newResource = RESOURCE.FRESH_WATER;
                         resources.freshWater++;
@@ -769,7 +826,7 @@ var Generator = function() {
 
             data[resourceBlock + i] = newResource;
             // mark spot unfit for trees and granite
-            if(data[siteBlock + i] === SITE.IMPASSABLE) {
+            if (data[siteBlock + i] === SITE.IMPASSABLE) {
                 data[touchBlock + i] = 1;
             } else {
                 usableLandmass++;
@@ -777,33 +834,35 @@ var Generator = function() {
         }
 
         // mark spots around headquarters unfir for trees and granite
-        for(i = 0; i < players.length; i++) {
-            nodes = map.getRadiusNodes(players[i].x, players[i].y, 5);
-            for(j = 0; j < nodes.length; j++) {
-                data[touchBlock + nodes[j]] = 1;
+        for (i = 0; i < players.length; i++) {
+            nearbyNodes = map.getRadiusNodes(players[i].x, players[i].y, 5);
+            for (j = 0; j < nearbyNodes.length; j++) {
+                data[touchBlock + nearbyNodes[j]] = 1;
             }
             usableLandmass -= j;
         }
 
         // calculate target amounts for trees
-        options.treeRatio = usableLandmass * options.treeRatio;
+        options.treeRatio *= usableLandmass;
 
         // apply trees
-        while(usableLandmass > 0 && resources.tree < options.treeRatio) {
+        while (usableLandmass > 0 && resources.tree < options.treeRatio) {
             i = ~~(Math.random() * size);
-            if(data[touchBlock + i] === 0) {
-                nodes = map.getRadiusNodes(i % width, ~~((i - (i % width)) / width), seedMap[i] & 0x07);
-                for(j = 0; j < nodes.length; j++) {
-                    k = nodes[j];
+            if (data[touchBlock + i] === 0) {
+                nearbyNodes = map.getRadiusNodes(i % width, ~~((i - (i % width)) / width), seedMap[i] & 0x07);
+                for (j = 0; j < nearbyNodes.length; j++) {
+                    k = nearbyNodes[j];
                     // see if we this location is free to use
-                    if(data[touchBlock + k] === 0) {
+                    if (data[touchBlock + k] === 0) {
                         // random here avoids getting stuck...
-                        if( (seedMap[k] & 0x03) < 2 || Math.random() < 0.2 ) {
+                        if ((seedMap[k] & 0x03) < 2 || Math.random() < 0.2) {
                             // mark done
                             data[touchBlock + k] = 1;
                             treeIndex = ~~(Math.random() * 6);
                             // skip through palm trees
-                            if(treeIndex > 2) treeIndex += 3;
+                            if (treeIndex > 2) {
+                                treeIndex += 3;
+                            }
                             // type
                             data[objectTypeBlock + k] = 0xC4 | (treeIndex >> 2);
                             // Pine / Birch / Oak / Palm 1
@@ -818,19 +877,19 @@ var Generator = function() {
         }
 
         // calculate target amounts for granite
-        options.graniteRatio = usableLandmass * options.graniteRatio;
+        options.graniteRatio *= usableLandmass;
 
         // apply granite
-        while(usableLandmass > 0 && resources.granite < options.graniteRatio) {
+        while (usableLandmass > 0 && resources.granite < options.graniteRatio) {
             i = ~~(Math.random() * size);
-            if(data[touchBlock + i] === 0) {
-                nodes = map.getRadiusNodes(i % width, ~~((i - (i % width)) / width), seedMap[i] & 0x07);
-                for(j = 0; j < nodes.length; j++) {
-                    k = nodes[j];
+            if (data[touchBlock + i] === 0) {
+                nearbyNodes = map.getRadiusNodes(i % width, ~~((i - (i % width)) / width), seedMap[i] & 0x07);
+                for (j = 0; j < nearbyNodes.length; j++) {
+                    k = nearbyNodes[j];
                     // see if we this location is free to use
-                    if(data[touchBlock + k] === 0) {
+                    if (data[touchBlock + k] === 0) {
                         // random here avoids getting stuck...
-                        if( (seedMap[k] & 0x03) < 2 || Math.random() < 0.2 ) {
+                        if ((seedMap[k] & 0x03) < 2 || Math.random() < 0.2) {
                             // mark done
                             data[touchBlock + k] = 1;
                             // type
@@ -847,7 +906,7 @@ var Generator = function() {
         }
 
         // clean up
-        for(i = 0; i < size; i++) {
+        for (i = 0; i < size; i++) {
             data[touchBlock + i] = 0;
         }
 
@@ -858,7 +917,7 @@ var Generator = function() {
     };
 
     var draw = function(options) {
-        //if(!options || !options.length) options = {};
+        // if (!options || !options.length) options = {};
         // draw the stuff so we can see stuff
         var canvas = options.canvas,
             buffer = canvas.getContext('2d'),
@@ -872,7 +931,9 @@ var Generator = function() {
         viewType = options.viewType;
         options.terrain = ~~options.terrain || TERRAIN.GREENLAND;
 
-        switch(viewType) {
+        var i, j, k
+
+        switch (viewType) {
         case 0:
         case 1:
         case 2:
@@ -888,7 +949,7 @@ var Generator = function() {
         case 12:
         case 13:
         case 14:
-            for(i = size * viewType, j = 0, k = i + size; i < k; i++) {
+            for (i = size * viewType, j = 0, k = i + size; i < k; i++) {
                 view[j++] = data[i];
                 view[j++] = data[i];
                 view[j++] = data[i];
@@ -896,235 +957,249 @@ var Generator = function() {
             }
             break;
         case 'seed':
-            for(i = 0, j = 0; i < size; i++) {
+            for (i = 0, j = 0; i < size; i++) {
                 view[j++] = 255 - seedMap[i];
                 view[j++] = 255 - seedMap[i];
                 view[j++] = 255 - seedMap[i];
                 view[j++] = 255;
             }
 
-            nodes.forEach(function(i) {
-                view[(i << 2)] = 96;
-                view[(i << 2) + 1] = 176;
-                view[(i << 2) + 2] = 255;
+            nodes.forEach(function(nodeIndex) {
+                view[(nodeIndex << 2)] = 96;
+                view[(nodeIndex << 2) + 1] = 176;
+                view[(nodeIndex << 2) + 2] = 255;
             });
             break;
         case 'fast':
-            var color = colors[options.terrain].data,
-                // row information so we can do some graphical adjustments
-                y = -1,
-                texture_color_merri = COLOR.MERRI[options.terrain],
-                texture_color_original = COLOR.ORIGINAL[options.terrain],
-                treeIndex, g, g2, c1, c2, c3, c4, c5, c6, c7, c8, c9, cA, cB, cC, j,
-                color1, color2, color3, colorAlpha,
-                drawNodes,
-                leftNodes,
-                textures,
-                texturesBlock = size,
-                objectIndexBlock = size * 4,
-                objectTypeBlock = size * 5,
-                drawPos = 0;
-    
-            // and then we just loop through!
-            for(i = 0; i < size; i++) {
-                // keep track of current row
-                if( i % width === 0) y++;
-                // mark as nothing drawn yet
-                color1 = void 0;
-                // not done yet! check for objects!
-                switch(data[objectTypeBlock + i]) {
-                // trees
-                case 196:
-                case 197:
-                case 198:
-                case 199:
-                    treeIndex = ((data[objectTypeBlock + i] & 2) << 2) | ((data[objectIndexBlock + i] & 0xC0) >> 6);
-                    // these colors are from screenshot of Map Editor / S2EDIT.EXE
-                    // FYI: tree indexes with color are 0, 1, 2, 6, 7, 8, 12, 13, 14, 18, 19, 20
-                    // the other half are not painted on the map
-                    switch((treeIndex % 6) + options.terrain * 6) {
-                    // GREENLAND 
-                    case 0:
-                        color1 = 0;
-                        color2 = 73;
-                        color3 = 18;
+            (function() {
+                var color = colors[options.terrain].data,
+                    // row information so we can do some graphical adjustments
+                    y = -1,
+                    textureColorOriginal = COLOR.ORIGINAL[options.terrain],
+                    treeIndex, g, c1,
+                    color1, color2, color3,
+                    texturesBlock = size,
+                    objectIndexBlock = size * 4,
+                    objectTypeBlock = size * 5,
+                    drawPos = 0;
+
+                // and then we just loop through!
+                for (i = 0; i < size; i++) {
+                    // keep track of current row
+                    if (i % width === 0) {
+                        y++;
+                    }
+                    // mark as nothing drawn yet
+                    color1 = null;
+                    // not done yet! check for objects!
+                    switch (data[objectTypeBlock + i]) {
+                    // trees
+                    case 196:
+                    case 197:
+                    case 198:
+                    case 199:
+                        treeIndex = ((data[objectTypeBlock + i] & 2) << 2) | ((data[objectIndexBlock + i] & 0xC0) >> 6);
+                        // these colors are from screenshot of Map Editor / S2EDIT.EXE
+                        // FYI: tree indexes with color are 0, 1, 2, 6, 7, 8, 12, 13, 14, 18, 19, 20
+                        // the other half are not painted on the map
+                        switch ((treeIndex % 6) + options.terrain * 6) {
+                        // GREENLAND
+                        case 0:
+                            color1 = 0;
+                            color2 = 73;
+                            color3 = 18;
+                            break;
+                        case 1:
+                            color1 = 6;
+                            color2 = 93;
+                            color3 = 15;
+                            break;
+                        case 2:
+                            color1 = 0;
+                            color2 = 51;
+                            color3 = 19;
+                            break;
+                        // WASTELAND
+                        case 6:
+                            color1 = 69;
+                            color2 = 59;
+                            color3 = 18;
+                            break;
+                        case 7:
+                            color1 = 69;
+                            color2 = 67;
+                            color3 = 42;
+                            break;
+                        case 8:
+                            color1 = 0;
+                            color2 = 51;
+                            color3 = 19;
+                            break;
+                        // WINTER WORLD
+                        case 12:
+                            color1 = 25;
+                            color2 = 64;
+                            color3 = 0;
+                            break;
+                        case 13:
+                            color1 = 41;
+                            color2 = 86;
+                            color3 = 0;
+                            break;
+                        case 14:
+                            color1 = 14;
+                            color2 = 41;
+                            color3 = 0;
+                            break;
+                        // NOTHING DRAWN ON MAP, these trees do not have a color
+                        default:
+                        }
                         break;
-                    case 1:
-                        color1 = 6;
-                        color2 = 93;
-                        color3 = 15;
+                    // granite
+                    case 204:
+                    case 205:
+                        // color1 = 134;
+                        // color2 = 122;
+                        // color3 = 103;
                         break;
-                    case 2:
-                        color1 = 0;
-                        color2 = 51;
-                        color3 = 19;
-                        break;
-                    // WASTELAND
-                    case 6:
-                        color1 = 69;
-                        color2 = 59;
-                        color3 = 18;
-                        break;
-                    case 7:
-                        color1 = 69;
-                        color2 = 67;
-                        color3 = 42;
-                        break;
-                    case 8:
-                        color1 = 0;
-                        color2 = 51;
-                        color3 = 19;
-                        break;
-                    // WINTER WORLD
-                    case 12:
-                        color1 = 25;
-                        color2 = 64;
-                        color3 = 0;
-                        break;
-                    case 13:
-                        color1 = 41;
-                        color2 = 86;
-                        color3 = 0;
-                        break;
-                    case 14:
-                        color1 = 14;
-                        color2 = 41;
-                        color3 = 0;
-                        break;
-                    // NOTHING DRAWN ON MAP, these trees do not have a color
                     default:
                     }
-                    break;
-                // granite
-                case 204:
-                case 205:
-                    //color1 = 134;
-                    //color2 = 122;
-                    //color3 = 103;
-                    break;
-                }
 
-                if(color1 === void 0) {
-                    g = ~~((data[lightMapBlock + i] / 128) * 255);
-                    c1 = (g + 256 * texture_color_original[data[texturesBlock + i] & 0x3F]) * 4;
-                    color1 = color[c1++];
-                    color2 = color[c1++];
-                    color3 = color[c1++];
-                }
+                    if (color1 == null) {
+                        g = ~~((data[lightMapBlock + i] / 128) * 255);
+                        c1 = (g + 256 * textureColorOriginal[data[texturesBlock + i] & 0x3F]) * 4;
+                        color1 = color[c1++];
+                        color2 = color[c1++];
+                        color3 = color[c1++];
+                    }
 
-                view[drawPos++] = color1;
-                view[drawPos++] = color2;
-                view[drawPos++] = color3;
-                view[drawPos++] = 255;
-            }
+                    view[drawPos++] = color1;
+                    view[drawPos++] = color2;
+                    view[drawPos++] = color3;
+                    view[drawPos++] = 255;
+                }
+            })()
             break;
         case 'pretty':
-            var color = colors[options.terrain].data,
-                // row information so we can do some graphical adjustments
-                y = -1,
-                texture_color_merri = COLOR.MERRI[options.terrain],
-                texture_color_original = COLOR.ORIGINAL[options.terrain],
-                treeIndex, g, g2, c1, c2, c3, c4, c5, c6, c7, c8, c9, cA, cB, cC, j,
-                color1, color2, color3, colorAlpha,
-                drawNodes,
-                leftNodes,
-                textures,
-                objectIndexBlock = size * 4,
-                objectTypeBlock = size * 5,
-                drawPos = 0;
-    
-            // and then we just loop through!
-            for(i = 0; i < size; i++) {
-                // keep track of current row
-                if( i % width === 0) y++;
-                drawNodes = map.getNodesByIndex(i);
-                leftNodes = map.getNodesByIndex(drawNodes.left);
-                // light and shadow calculation (not like the one in the game!)
-                g = 96, j = data[i];
-                g += 12 * (data[ drawNodes.topRight ] - j);
-                g += 8 * (data[ drawNodes.topLeft ] - j);
-                g -= 8 * (data[ drawNodes.left ] - j);
-                g -= 16 * (data[ leftNodes.bottomLeft ] - j);
-                // keep value within valid range
-                g = Math.max(Math.min(255, g), 0);
-                // grab some textures
-                textures = map.getTexturesByIndex(i);
-                // get a few color indexes...
-                c1 = (g + 256 * texture_color_merri[ textures.topLeft ]) * 4;
-                c2 = (g + 256 * texture_color_original[ textures.topLeft ]) * 4;
-                c3 = (g + 256 * texture_color_merri[ textures.top ]) * 4;
-                c4 = (g + 256 * texture_color_original[ textures.top ]) * 4;
-                c5 = (g + 256 * texture_color_merri[ textures.topRight ]) * 4;
-                c6 = (g + 256 * texture_color_original[ textures.topRight ]) * 4;
-                c7 = (g + 256 * texture_color_merri[ textures.bottomLeft ]) * 4;
-                c8 = (g + 256 * texture_color_original[ textures.bottomLeft ]) * 4;
-                c9 = (g + 256 * texture_color_merri[ textures.bottom ]) * 4;
-                cA = (g + 256 * texture_color_original[ textures.bottom ]) * 4;
-                cB = (g + 256 * texture_color_merri[ textures.bottomRight ]) * 4;
-                cC = (g + 256 * texture_color_original[ textures.bottomRight ]) * 4;
-                // then make a color mixture...
-                color1 = ((color[c1++] + color[c2++] + color[c3++] + color[c4++] + color[c5++] + color[c6++] + color[c7++] + color[c8++] + color[c9++] + color[cA++] + color[cB++] + color[cC++] ) / 12) | 0;
-                color2 = ((color[c1++] + color[c2++] + color[c3++] + color[c4++] + color[c5++] + color[c6++] + color[c7++] + color[c8++] + color[c9++] + color[cA++] + color[cB++] + color[cC++] ) / 12) | 0;
-                color3 = ((color[c1++] + color[c2++] + color[c3++] + color[c4++] + color[c5++] + color[c6++] + color[c7++] + color[c8++] + color[c9++] + color[cA++] + color[cB++] + color[cC++] ) / 12) | 0;
-                // water is almost transparent (water only node = 255 - 160)
-                colorAlpha = 255 - 30 * ((textures.topLeft === 5) + (textures.top === 5) + (textures.topRight === 5) + 
-                    (textures.bottomLeft === 5) + (textures.bottom === 5) + (textures.bottomRight === 5));
-                
-                // not done yet! check for objects!
-                switch(data[objectTypeBlock + i]) {
-                // trees
-                case 196:
-                case 197:
-                case 198:
-                case 199:
-                    treeIndex = ((data[objectTypeBlock + i] & 2) << 2) | ((data[objectIndexBlock + i] & 0xC0) >> 6);
-                    g = TREE_INFO[options.terrain][treeIndex].ALPHA + (((data[objectIndexBlock + i] & 7) + 1) / 25) - 0.32;
-                    g2 = (1 - g);
-                    color1 = ~~(color1 * g2 + TREE_INFO[options.terrain][treeIndex].RED * g);
-                    color2 = ~~(color2 * g2 + TREE_INFO[options.terrain][treeIndex].GREEN * g);
-                    color3 = ~~(color3 * g2 + TREE_INFO[options.terrain][treeIndex].BLUE * g);
-                    break;
-                // granite
-                case 204:
-                case 205:
-                    g = data[objectIndexBlock + i] / 10;
-                    g2 = ((color1 + color2 + color3) / 3 + 64 ) * g;
-                    color1 = Math.min(255, color1 * (1 - g) + g2);
-                    color2 = Math.min(255, color2 * (1 - g) + g2);
-                    color3 = Math.min(255, color3 * (1 - g) + g2);
-                    break;
+            (function() {
+                var color = colors[options.terrain].data,
+                    // row information so we can do some graphical adjustments
+                    y = -1,
+                    textureColorMerri = COLOR.MERRI[options.terrain],
+                    textureColorOriginal = COLOR.ORIGINAL[options.terrain],
+                    treeIndex, g, g2, c1, c2, c3, c4, c5, c6, c7, c8, c9, cA, cB, cC,
+                    color1, color2, color3, colorAlpha,
+                    drawNodes,
+                    leftNodes,
+                    textures,
+                    objectIndexBlock = size * 4,
+                    objectTypeBlock = size * 5,
+                    drawPos = 0;
+
+                // and then we just loop through!
+                for (i = 0; i < size; i++) {
+                    // keep track of current row
+                    if (i % width === 0) {
+                        y++;
+                    }
+                    drawNodes = map.getNodesByIndex(i);
+                    leftNodes = map.getNodesByIndex(drawNodes.left);
+                    // light and shadow calculation (not like the one in the game!)
+                    j = data[i];
+                    g = 96;
+                    g += 12 * (data[ drawNodes.topRight ] - j);
+                    g += 8 * (data[ drawNodes.topLeft ] - j);
+                    g -= 8 * (data[ drawNodes.left ] - j);
+                    g -= 16 * (data[ leftNodes.bottomLeft ] - j);
+                    // keep value within valid range
+                    g = Math.max(Math.min(255, g), 0);
+                    // grab some textures
+                    textures = map.getTexturesByIndex(i);
+                    // get a few color indexes...
+                    c1 = (g + 256 * textureColorMerri[textures.topLeft]) * 4;
+                    c2 = (g + 256 * textureColorOriginal[textures.topLeft]) * 4;
+                    c3 = (g + 256 * textureColorMerri[textures.top]) * 4;
+                    c4 = (g + 256 * textureColorOriginal[textures.top]) * 4;
+                    c5 = (g + 256 * textureColorMerri[textures.topRight]) * 4;
+                    c6 = (g + 256 * textureColorOriginal[textures.topRight]) * 4;
+                    c7 = (g + 256 * textureColorMerri[textures.bottomLeft]) * 4;
+                    c8 = (g + 256 * textureColorOriginal[textures.bottomLeft]) * 4;
+                    c9 = (g + 256 * textureColorMerri[textures.bottom]) * 4;
+                    cA = (g + 256 * textureColorOriginal[textures.bottom]) * 4;
+                    cB = (g + 256 * textureColorMerri[textures.bottomRight]) * 4;
+                    cC = (g + 256 * textureColorOriginal[textures.bottomRight]) * 4;
+                    // then make a color mixture...
+                    color1 = ((color[c1++] + color[c2++] + color[c3++] + color[c4++] + color[c5++] + color[c6++] + color[c7++] + color[c8++] + color[c9++] + color[cA++] + color[cB++] + color[cC++]) / 12) | 0;
+                    color2 = ((color[c1++] + color[c2++] + color[c3++] + color[c4++] + color[c5++] + color[c6++] + color[c7++] + color[c8++] + color[c9++] + color[cA++] + color[cB++] + color[cC++]) / 12) | 0;
+                    color3 = ((color[c1++] + color[c2++] + color[c3++] + color[c4++] + color[c5++] + color[c6++] + color[c7++] + color[c8++] + color[c9++] + color[cA++] + color[cB++] + color[cC++]) / 12) | 0;
+                    // water is almost transparent (water only node = 255 - 160)
+                    colorAlpha = 255 - 30 * ((textures.topLeft === 5) + (textures.top === 5) + (textures.topRight === 5)
+                        + (textures.bottomLeft === 5) + (textures.bottom === 5) + (textures.bottomRight === 5));
+                    // not done yet! check for objects!
+                    switch (data[objectTypeBlock + i]) {
+                    // trees
+                    case 196:
+                    case 197:
+                    case 198:
+                    case 199:
+                        treeIndex = ((data[objectTypeBlock + i] & 2) << 2) | ((data[objectIndexBlock + i] & 0xC0) >> 6);
+                        g = TREE_INFO[options.terrain][treeIndex].ALPHA + (((data[objectIndexBlock + i] & 7) + 1) / 25) - 0.32;
+                        g2 = (1 - g);
+                        color1 = ~~(color1 * g2 + TREE_INFO[options.terrain][treeIndex].RED * g);
+                        color2 = ~~(color2 * g2 + TREE_INFO[options.terrain][treeIndex].GREEN * g);
+                        color3 = ~~(color3 * g2 + TREE_INFO[options.terrain][treeIndex].BLUE * g);
+                        break;
+                    // granite
+                    case 204:
+                    case 205:
+                        g = data[objectIndexBlock + i] / 10;
+                        g2 = ((color1 + color2 + color3) / 3 + 64) * g;
+                        color1 = Math.min(255, color1 * (1 - g) + g2);
+                        color2 = Math.min(255, color2 * (1 - g) + g2);
+                        color3 = Math.min(255, color3 * (1 - g) + g2);
+                        break;
+                    default:
+                    }
+                    view[drawPos++] = color1;
+                    view[drawPos++] = color2;
+                    view[drawPos++] = color3;
+                    view[drawPos++] = colorAlpha;
                 }
-                view[drawPos++] = color1;
-                view[drawPos++] = color2;
-                view[drawPos++] = color3;
-                view[drawPos++] = colorAlpha;
-            }
+            })()
             break;
         default:
-            console.log('WTF');
+            throw new Error('Unknown viewType option ' + options.viewType)
         }
-        
+
         buffer.putImageData(image, 0, 0);
     }
 
     function sanitizeStringAsCP437(text) {
         var output = '',
-            code;
-        for(i = 0; i < text.length; i++) {
+            code,
+            i;
+        for (i = 0; i < text.length; i++) {
             code = CP437.indexOf(~~text.charCodeAt(i));
-            if(code > -1) output += text[i];
-            else output += String.fromCharCode(CP437[0xDB]);
+            if (code > -1) {
+                output += text[i];
+            } else {
+                output += String.fromCharCode(CP437[0xDB]);
+            }
         }
         return output;
     }
 
     function veryInefficientStringToCP437(text, length) {
         var output = [],
-            code;
-        for(i = 0; i < length; i++) {
+            code,
+            i;
+        for (i = 0; i < length; i++) {
             code = CP437.indexOf(~~text.charCodeAt(i));
-            if(code > -1) output.push(code);
-            else output.push(0xDB);
+            if (code > -1) {
+                output.push(code);
+            } else {
+                output.push(0xDB);
+            }
         }
         return output;
     }
@@ -1135,7 +1210,7 @@ var Generator = function() {
         //       + footer 0xFF
         var buffer = new ArrayBuffer(2577 + size * 14),
             view = new DataView(buffer),
-            byteView = void 0,
+            byteView,
             pos = 0,
             i,
             objectIndexBlock = size * 4,
@@ -1177,55 +1252,55 @@ var Generator = function() {
         });
         view.setUint8(pos++, 0);
         // HEADQUARTERS
-        if(players.length > 0) {
+        if (players.length > 0) {
             view.setUint16(pos, players[0].x, true);
             view.setUint16(pos + 14, players[0].y, true);
         } else {
             view.setUint16(pos, 0xFFFF, true);
             view.setUint16(pos + 14, 0xFFFF, true);
         }
-        
-        if(players.length > 1) {
+
+        if (players.length > 1) {
             view.setUint16(pos + 2, players[1].x, true);
             view.setUint16(pos + 16, players[1].y, true);
         } else {
             view.setUint16(pos + 2, 0xFFFF, true);
             view.setUint16(pos + 16, 0xFFFF, true);
         }
-        
-        if(players.length > 2) {
+
+        if (players.length > 2) {
             view.setUint16(pos + 4, players[2].x, true);
             view.setUint16(pos + 18, players[2].y, true);
         } else {
             view.setUint16(pos + 4, 0xFFFF, true);
             view.setUint16(pos + 18, 0xFFFF, true);
         }
-        
-        if(players.length > 3) {
+
+        if (players.length > 3) {
             view.setUint16(pos + 6, players[3].x, true);
             view.setUint16(pos + 20, players[3].y, true);
         } else {
             view.setUint16(pos + 6, 0xFFFF, true);
             view.setUint16(pos + 20, 0xFFFF, true);
         }
-        
-        if(players.length > 4) {
+
+        if (players.length > 4) {
             view.setUint16(pos + 8, players[4].x, true);
             view.setUint16(pos + 22, players[4].y, true);
         } else {
             view.setUint16(pos + 8, 0xFFFF, true);
             view.setUint16(pos + 22, 0xFFFF, true);
         }
-        
-        if(players.length > 5) {
+
+        if (players.length > 5) {
             view.setUint16(pos + 10, players[5].x, true);
             view.setUint16(pos + 24, players[5].y, true);
         } else {
             view.setUint16(pos + 10, 0xFFFF, true);
             view.setUint16(pos + 24, 0xFFFF, true);
         }
-        
-        if(players.length > 6) {
+
+        if (players.length > 6) {
             view.setUint16(pos + 12, players[6].x, true);
             view.setUint16(pos + 26, players[6].y, true);
         } else {
@@ -1236,7 +1311,7 @@ var Generator = function() {
         pos += 28;
 
         // set object types and indexes for players
-        for(i = 0; i < players.length; i++) {
+        for (i = 0; i < players.length; i++) {
             data[objectIndexBlock + players[i].index] = i;
             data[objectTypeBlock + players[i].index] = 0x80;
         }
@@ -1253,14 +1328,14 @@ var Generator = function() {
         view.setUint8(pos++, 7);
 
         // SET AREAS
-        for(i = 0; i < Math.min(areas.length, 250); i++) {
+        for (i = 0; i < Math.min(areas.length, 250); i++) {
             view.setUint8(pos++, areas[i].type);
             view.setUint16(pos++, areas[i].x, true);
             pos++;
             view.setUint16(pos++, areas[i].y, true);
             pos++;
             view.setUint32(pos, areas[i].mass, true);
-            pos+=4;
+            pos += 4;
         }
 
         // SKIP UNUSED AREAS
@@ -1276,7 +1351,7 @@ var Generator = function() {
         view.setUint16(pos++, height, true);
         pos++;
         // MAP DATA
-        for(i = 0; i < 14; i++) {
+        for (i = 0; i < 14; i++) {
             view.setUint8(pos++, 0x10);
             view.setUint8(pos++, 0x27);
             view.setUint32(pos, 0);
@@ -1297,7 +1372,7 @@ var Generator = function() {
         view.setUint8(pos++, 0xFF);
 
         // restore object types and indexes for players
-        for(i = 0; i < players.length; i++) {
+        for (i = 0; i < players.length; i++) {
             data[objectIndexBlock + players[i].index] = 0;
             data[objectTypeBlock + players[i].index] = 0;
         }
@@ -1345,7 +1420,7 @@ var Generator = function() {
 
             colorMap.onerror = reject;
 
-            switch(name) {
+            switch (name) {
                 case 'alternative':
                     colorMap.src = './lightmap_index_alternative.png';
                     break;
