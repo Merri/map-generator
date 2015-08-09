@@ -2,17 +2,17 @@
 
 var path = require('path')
 var webpack = require('webpack')
-var prod = process.env.NODE_ENV === 'production'
+var isProduction = process.env.NODE_ENV === 'production'
 
 var config = {
-    devtool: prod ? null : 'eval',
+    devtool: isProduction ? null : 'eval',
 
     entry: [
-        path.join(__dirname, 'src/generator.js')
+        path.resolve(__dirname, 'src/controller.jsx')
     ],
 
     output: {
-        path: path.join(__dirname, 'public'),
+        path: path.resolve(__dirname, 'public'),
         filename: 'bundle.js',
         publicPath: '/public'
     },
@@ -23,7 +23,16 @@ var config = {
 
     module: {
         loaders: [
-            { test: /\.js$/, loaders: ['babel?stage=0'], exclude: /node_modules/ }
+            {
+                test: /\.jsx?$/,
+                exclude: /node_modules/,
+                loader: 'babel',
+                query: {
+                    cacheDirectory: true,
+                    optional: [],
+                    stage: 0
+                }
+            }
         ]
     },
 
@@ -32,7 +41,7 @@ var config = {
     ]
 }
 
-if (prod) {
+if (isProduction) {
     config.plugins.push(new webpack.optimize.DedupePlugin())
     config.plugins.push(new webpack.optimize.OccurenceOrderPlugin(true))
     config.plugins.push(new webpack.optimize.UglifyJsPlugin())

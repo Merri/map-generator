@@ -37,7 +37,7 @@
     "mocha": "^2.2.5",
     "mocha-jsdom": "^0.3.0",
     "node-libs-browser": "^0.5.0",
-    "react": "~0.13.0",
+    "react": "~0.13.3",
     "webpack": "^1.9.7",
     "promise": "^6.0.0",
     "browserify": "^5.11.2",

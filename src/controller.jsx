@@ -1,11 +1,8 @@
-/**
- * @jsx React.DOM
- */
 'use strict';
 
 var React = require('react'),
     Generator = require('./generator'),
-    Compatibility = require('./components/compatibility.jsx'),
+    // Compatibility = require('./components/compatibility.jsx'),
     IncDec = require('./components/inc-dec.jsx'),
     TextureOption = require('./components/texture-option.jsx'),
     Unsupported = require('./components/unsupported.jsx');
@@ -321,7 +318,7 @@ var App = React.createClass({
 
     render: function() {
         if (!this.state.meetsRequirements) {
-            return <Unsupported />;
+            return <Unsupported />
         }
 
         var gold = this.state.resources.mineGold || 0,
@@ -552,7 +549,7 @@ var App = React.createClass({
 });
 
 window.onload = function() {
-    React.renderComponent(
+    React.render(
         <App />,
         document.getElementById('app')
     );
