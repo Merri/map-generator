@@ -1,44 +1,37 @@
-'use strict';
+'use strict'
 
-var Promise = require('promise'),
-    S2Map = require('./map');
+import Promise from 'promise'
+import S2Map from './map'
 
-var constants = require('./constants');
-
-var CP437 = constants.CP437,
-    COLOR = constants.COLOR,
-    RESOURCE = constants.RESOURCE,
-    SITE = constants.SITE,
-    TERRAIN = constants.TERRAIN,
-    TEXTURE = constants.TEXTURE,
-    TEXTURE_INFO = constants.TEXTURE_INFO,
-    TREE_INFO = constants.TREE_INFO;
+import {
+    CP437,
+    COLOR,
+    RESOURCE,
+    SITE,
+    TERRAIN,
+    TEXTURE,
+    TEXTURE_INFO,
+    TREE_INFO
+} from './constants'
 
 var Generator = function() {
     var map,
         areas,
-        around,
-        aroundExpandTo,
         baseLevel,
-        borderProtection,
         colorMap,
         colors = [],
         data,
         deletedNodes,
         height,
         mass,
-        massRatio,
         nodes,
         players = [],
         size,
         seedMap,
-        startingPoints,
-        total,
-        viewType,
         width;
 
     function expandTo(index, value, current) {
-        aroundExpandTo = map.getNodesByIndex(index);
+        var aroundExpandTo = map.getNodesByIndex(index);
 
         seedMap[index] = value;
         if (current != null) {
@@ -76,7 +69,7 @@ var Generator = function() {
         width = ~~options.width;
         height = ~~options.height;
         size = width * height;
-        borderProtection = ~~options.borderProtection;
+        var borderProtection = ~~options.borderProtection;
         if (borderProtection) {
             borderProtection = ~~(Math.min(width, height) / borderProtection);
         }
@@ -101,8 +94,8 @@ var Generator = function() {
         nodes = [];
         deletedNodes = [];
         mass = 0;
-        massRatio = ~~(size / 100 * givenMassRatio);
-        startingPoints = 0;
+        var massRatio = ~~(size / 100 * givenMassRatio);
+        var startingPoints = 0;
 
         map = new S2Map(width, height);
         data = map.getRawData();
@@ -164,7 +157,8 @@ var Generator = function() {
         */
 
         var expander = 7;
-
+        var around
+        var total
         var i
 
         // do the land expansion
@@ -174,10 +168,9 @@ var Generator = function() {
                 for (i = nodes.length; i > 0; --i) {
                     index = nodes[i];
                     if (index != null) {
-                        total = 0;
                         around = map.getNodesByIndex(index);
 
-                        total += (seedMap[around.left] > 1)
+                        total = (seedMap[around.left] > 1)
                             + (seedMap[around.right] > 1)
                             + (seedMap[around.topLeft] > 1)
                             + (seedMap[around.topRight] > 1)
@@ -233,6 +226,7 @@ var Generator = function() {
             }
         }
 
+        var around
         var j, k
         var value
         // draw the final height map based on what we have
@@ -939,7 +933,7 @@ var Generator = function() {
         canvas.width = width;
         canvas.height = height;
 
-        viewType = options.viewType;
+        var viewType = options.viewType;
         options.terrain = ~~options.terrain || TERRAIN.GREENLAND;
 
         var i, j, k
