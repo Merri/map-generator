@@ -1,6 +1,8 @@
 **NOTE!** This project is being refactored for better code reuse.
 
 # Map Generator
+[![Version](http://img.shields.io/npm/v/map-generator.svg)](https://www.npmjs.org/package/map-generator)
+[![Build Status](https://travis-ci.org/Merri/map-generator.svg)](https://travis-ci.org/Merri/map-generator)
 
 JavaScript utilities for working with 2D game maps and terrains for the purpose of generating cool looking fields to
 play with.
