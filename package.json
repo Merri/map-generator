@@ -13,7 +13,7 @@
     "build": "NODE_ENV=production webpack",
     "build_windows": "set NODE_ENV=production&&webpack",
     "watch": "webpack --watch",
-    "test": "mocha --reporter spec"
+    "test": "mocha --compilers js:babel/register --reporter spec"
   },
   "repository": {
     "type": "git",
@@ -26,24 +26,25 @@
   },
   "homepage": "https://github.com/merri/map-generator",
   "devDependencies": {
+    "babel": "^5.8.21",
     "babel-core": "^5.4.3",
     "babel-eslint": "^4.0.5",
     "babel-loader": "^5.1.2",
+    "browserify": "^5.11.2",
     "chai": "^2.3.0",
     "eslint": "^1.0.0",
     "eslint-config-vaffel": "^1.0.0",
     "eslint-plugin-react": "^2.3.0",
     "jsdom": "3.1.2",
+    "minifyify": "^4.1.2",
     "mocha": "^2.2.5",
     "mocha-jsdom": "^0.3.0",
     "node-libs-browser": "^0.5.0",
-    "react": "~0.13.3",
-    "webpack": "^1.9.7",
     "promise": "^6.0.0",
-    "browserify": "^5.11.2",
-    "minifyify": "^4.1.2",
+    "react": "~0.13.3",
     "reactify": "^0.14.0",
     "uglifyify": "^2.5.0",
-    "watchify": "^1.0.2"
+    "watchify": "^1.0.2",
+    "webpack": "^1.9.7"
   }
 }
