@@ -240,9 +240,30 @@ describe('MapGenerator', function() {
         expect(mg.getHexIndex(15, 2, 5)).to.equal(6)
     })
 
+    it('should always add at least one spot of noise', function() {
+        var mg = new MapGenerator(4, 4)
+        var result = mg.addValueNoise(0, 255)
+        expect(result.length).to.equal(1)
+    })
+
     it('should add one spot of noise when asking for 6.25% on 4 x 4 map', function() {
         var mg = new MapGenerator(4, 4)
         var result = mg.addValueNoise(0.0625, 255)
         expect(result.length).to.equal(1)
+    })
+
+    it('should add two spots of noise when asking for 12.5% on 4 x 4 map', function() {
+        var mg = new MapGenerator(4, 4)
+        var result = mg.addValueNoise(0.125, 255)
+        expect(result.length).to.equal(2)
+    })
+
+    it('should fill data with given value', function() {
+        var mg = new MapGenerator(2, 2)
+        mg.fill(123)
+        expect(mg.data[0]).to.equal(123)
+        expect(mg.data[1]).to.equal(123)
+        expect(mg.data[2]).to.equal(123)
+        expect(mg.data[3]).to.equal(123)
     })
 })

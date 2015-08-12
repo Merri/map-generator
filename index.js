@@ -69,7 +69,7 @@ class MapGenerator {
         emptyValue &= 0xFF
         ratio = Number(ratio)
 
-        if (ratio <= 0 || ratio >= 0.5) {
+        if (ratio < 0 || ratio >= 0.5) {
             throw new Error('First argument must be a ratio between 0 and 0.5')
         }
 
@@ -81,6 +81,10 @@ class MapGenerator {
         let iterations = ~~(ratio * this.size)
         let position
         let result = []
+
+        if (iterations === 0) {
+            iterations = 1
+        }
 
         while (result.length < iterations && iterationCounter < this.size) {
             position = ~~(this.random() * this.size)
@@ -111,7 +115,7 @@ class MapGenerator {
         ratio = Number(ratio)
         distance = ~~distance
 
-        if (ratio <= 0 || ratio >= 0.125) {
+        if (ratio < 0 || ratio >= 0.125) {
             throw new Error('First argument must be a ratio between 0 and 0.125')
         }
 
@@ -169,6 +173,10 @@ turn180`)
         let result = []
         let moveChange
         let j
+
+        if (iterations === 0) {
+            iterations = 1
+        }
 
         while (result.length < iterations && iterationCounter < this.size) {
             position = this.getHexIndex(position, distance, direction)
@@ -302,17 +310,13 @@ turn180`)
     }
 
     /*
-     * Resets field on a new data
+     * Resets field to given value
      * @param {Number} value Fill with this unsigned 8-bit value
      */
-    clear(value) {
-        this.data = new Uint8Array(this.size)
-
+    fill(value) {
         value &= 0xFF
-        if (value) {
-            for (let i = 0; i < this.size; i++) {
-                this.data[i] = value
-            }
+        for (let i = 0; i < this.size; i++) {
+            this.data[i] = value
         }
     }
 /*
